@@ -1,66 +1,73 @@
-# CHANGELOG.md
+# CHANGELOG
 
-# Changelog - Cofinance CI
+Toutes les modifications importantes du projet COFINANCE CI seront documentées dans ce fichier.
 
-Toutes les modifications importantes du projet seront documentées dans ce fichier.
-
-Le format s'inspire du principe "Keep a Changelog".
-
----
-## [0.1.0] - 2026-06-05
-
-* Création du dépôt GitHub du projet.
-
-## [0.1.1] - 2026-06-06
+## [0.2.0] - Juin 2026
 
 ### Ajouté
 
-* Initialisation du projet Django.
-* Mise en place d'un environnement virtuel Python.
-* Configuration du fichier `.env`.
-* Organisation du projet avec un dossier `apps/`.
-* Création des premières applications métier :
+* Architecture Django modulaire basée sur plusieurs applications :
 
   * authentication
   * credits
-  * chat
+  * remboursements
   * assurance
-  * dashboard
+  * chat
   * notifications
-  *remboursements
-* Mise en place de la structure de configuration Django.
-* Configuration initiale des routes du projet.
+* Configuration de l'environnement virtuel Python.
+* Mise en place de PostgreSQL.
+* Configuration des variables d'environnement (.env).
+* Création du modèle utilisateur personnalisé `CustomUser`.
+* Définition des rôles :
 
-### Modifié
+  * CLIENT
+  * AGENT
+  * ADMIN
+* Mise en place du système d'authentification JWT.
+* Début de l'API REST avec Django REST Framework.
+* Documentation automatique avec DRF Spectacular.
+* Création des modèles de crédit :
 
-* Ajustement de la configuration des applications dans `INSTALLED_APPS`.
-* Configuration du modèle utilisateur personnalisé (`CustomUser`).
-* Réorganisation de l'architecture des applications dans le dossier `apps/`.
+  * DemandeCredit
+  * EcheancierRemboursement
+  * PieceJustificative
+  * HistoriqueStatutCredit
+* Création des modèles d'assurance :
+
+  * FormulaAssurance
+  * Souscription
+* Création du modèle Paiement.
+* Première version du système de notifications.
+* Première version du système de chat client-agent.
+* Commande de peuplement de base de données (`seed_db`).
 
 ### Corrigé
 
-* Correction des erreurs liées à `load_dotenv`.
-* Correction des erreurs d'import des applications Django.
-* Correction des erreurs de configuration des URLs.
-* Correction des erreurs de résolution de modules Python.
-* Correction des erreurs liées à `TemplateView`.
+* Correction de multiples erreurs d'importation Django.
+* Correction des chemins d'applications dans INSTALLED_APPS.
+* Correction de AUTH_USER_MODEL.
+* Correction des imports circulaires.
+* Correction des ForeignKey sans `on_delete`.
+* Correction des OneToOneField incomplets.
+* Correction des constantes `*_CHOICES` manquantes.
+* Harmonisation des noms de modèles (`DemandeCredit`, `HistoriqueStatutCredit`, etc.).
+* Correction des imports de serializers.
+* Correction des URLs d'applications.
 
-### En cours
+### Technique
 
-* Stabilisation de l'architecture du projet.
-* Validation des routes et des applications.
-* Configuration complète de l'application d'authentification.
-* Mise en place du système de chat temps réel.
+* Réorganisation des applications dans le dossier `apps/`.
+* Standardisation progressive de l'architecture Django.
+* Début de stabilisation des migrations.
+* Préparation du projet pour les premiers tests fonctionnels.
 
 ---
 
-## Versions futures
+## [0.1.0] - Initialisation
 
-Les prochaines versions documenteront :
+### Ajouté
 
-* Authentification complète.
-* Gestion des crédits.
-* API REST.
-* Chat temps réel.
-* Tableau de bord administrateur.
-* Déploiement du projet.
+* Création du dépôt GitHub.
+* Initialisation du projet Django.
+* Mise en place de Git.
+* Création de la structure de base du backend.

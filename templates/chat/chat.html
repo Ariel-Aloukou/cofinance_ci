@@ -1,0 +1,79 @@
+<!-- templates/chat/chat.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>COFINANCE CI — Support Client</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", sans-serif; background: #f0f2f5;
+               height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .chat-container { width: 500px; height: 650px; background: white;
+               border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+               display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #1a5276; color: white; padding: 16px 20px;
+               display: flex; align-items: center; gap: 12px; }
+        .message.moi  { align-self: flex-end; background: #1a5276; color: white; }
+        .message.autre { align-self: flex-start; background: #f0f2f5; color: #333; }
+        /* ... (voir le guide Markdown pour les styles complets) */
+    </style>
+</head>
+<body>
+<div class="chat-container">
+  <div id="login-zone">
+    <input type="text"     id="username"  placeholder="Nom d'utilisateur" />
+    <input type="password" id="password"  placeholder="Mot de passe" />
+    <input type="number"   id="conv-id"   placeholder="ID de conversation (ex: 1)" />
+    <button onclick="seConnecter()">Se connecter</button>
+  </div>
+  <div id="chat-zone" style="display:none">
+    <div class="chat-header"><div class="status-dot" id="status-dot"></div>
+      <h2>Support Client COFINANCE CI</h2>
+    </div>
+    <div id="messages-zone"></div>
+    <div id="frappe-indicator"></div>
+    <div class="input-zone">
+      <input id="message-input" onkeypress="gererTouche(event)" oninput="signalerFrappe()" />
+      <button onclick="envoyerMessage()">➤</button>
+    </div>
+  </div>
+</div>
+<script>
+  let socket = null, token = null, monUserId = null;
+ 
+  async function seConnecter() {
+    const resp = await fetch("/api/auth/login/", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({username: document.getElementById("username").value,
+                            password: document.getElementById("password").value})
+    });
+    const data = await resp.json();
+    token = data.access;
+    const profil = await fetch("/api/auth/profil/", {
+      headers: {"Authorization": `Bearer ${token}`}}).then(r => r.json());
+    monUserId = profil.id;
+    connecterWebSocket(document.getElementById("conv-id").value);
+  }
+ 
+  function connecterWebSocket(convId) {
+    socket = new WebSocket(`ws://${window.location.host}/ws/chat/${convId}/`);
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "message") afficherMessage(data.message);
+      else if (data.type === "frappe")
+        document.getElementById("frappe-indicator").textContent =
+          `${data.auteur_nom} est en train d'écrire...`;
+    };
+  }
+ 
+  function envoyerMessage() {
+    const input   = document.getElementById("message-input");
+    if (!input.value.trim()) return;
+    socket.send(JSON.stringify({type: "message", contenu: input.value}));
+    input.value = "";
+  }
+  function signalerFrappe() {
+    if (socket) socket.send(JSON.stringify({type: "frappe"}));
+  }
+</script>
+</body></html>

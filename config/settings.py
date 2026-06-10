@@ -149,6 +149,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Dossier où Django stocke les fichiers uploadés
+MEDIA_URL  = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+ 
+# Taille maximale d'upload : 10 Mo
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE  = 10 * 1024 * 1024
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -174,12 +183,56 @@ SIMPLE_JWT = {
 }
  
 SPECTACULAR_SETTINGS = {
-    "TITLE": "COFINANCE CI — API REST",
-    "DESCRIPTION": "Plateforme digitale de microcrédits, assurance et support",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
+    "TITLE":       "COFINANCE CI — API REST",
+    "DESCRIPTION": """
+## Plateforme digitale de microcrédits, assurance mobile et support client.
+ 
+### Authentification
+Toutes les routes (sauf /auth/register/ et /auth/login/) requièrent un token JWT.
+Dans Swagger : cliquer sur **Authorize** et entrer : `Bearer <votre_token>`
+ 
+### Rôles disponibles
+- **CLIENT** : dépose des demandes, consulte son historique, ouvre un chat
+- **AGENT**  : traite les dossiers, enregistre les paiements, répond au chat
+- **ADMIN**  : accès complet + tableau de bord + gestion des présences
+ 
+### Comptes de test
+| Rôle  | Username         | Password     |
+|-------|-----------------|--------------|
+| Admin | admin_cofinance  | Admin@2026   |
+| Agent | agent_kouassi   | Agent@2026   |
+| Client| aya_kone        | Client@2026  |
+    """,
+    "VERSION":               "1.0.0",
+    "SERVE_INCLUDE_SCHEMA":  False,
     "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX":    "/api/",
+    # Groupement par tags dans Swagger
+    "TAGS": [
+        {"name": "Authentification",       "description": "Inscription, connexion, profil"},
+        {"name": "Microcrédits",           "description": "Demandes de crédit et workflow"},
+        {"name": "Pièces Justificatives",  "description": "Upload et gestion des documents"},
+        {"name": "Remboursements",         "description": "Paiements et alertes"},
+        {"name": "Assurance",              "description": "Formules et souscriptions"},
+        {"name": "Dashboard",              "description": "Indicateurs et statistiques"},
+        {"name": "Notifications",          "description": "Alertes in-app"},
+        {"name": "Chat",                   "description": "Conversations en temps réel"},
+        {"name": "Chat — Évaluation",      "description": "NPS et satisfaction"},
+        {"name": "Présence Agents",        "description": "Statuts de disponibilité"},
+    ],
+    # Ajoute le bouton Authorize JWT dans l'interface Swagger
+    "SECURITY": [{"jwtAuth": []}],
+    "COMPONENTS": {
+        "securitySchemes": {
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
 }
+
  
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:8000"]
 CORS_ALLOW_CREDENTIALS = True
