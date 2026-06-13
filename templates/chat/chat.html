@@ -1,79 +1,392 @@
-<!-- templates/chat/chat.html -->
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <title>COFINANCE CI — Support Client</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "Segoe UI", sans-serif; background: #f0f2f5;
-               height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .chat-container { width: 500px; height: 650px; background: white;
-               border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-               display: flex; flex-direction: column; overflow: hidden; }
-        .chat-header { background: #1a5276; color: white; padding: 16px 20px;
-               display: flex; align-items: center; gap: 12px; }
-        .message.moi  { align-self: flex-end; background: #1a5276; color: white; }
-        .message.autre { align-self: flex-start; background: #f0f2f5; color: #333; }
-        /* ... (voir le guide Markdown pour les styles complets) */
-    </style>
+  <meta charset="UTF-8">
+  <title>COFINANCE CI — Support Client</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-container {
+      width: 500px;
+      height: 650px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #1a5276;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .chat-header span {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #e74c3c;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .messages-zone {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .message.moi {
+      align-self: flex-end;
+      background: #1a5276;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.autre {
+      align-self: flex-start;
+      background: #f0f2f5;
+      color: #333;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message .auteur {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+
+    .message .heure {
+      font-size: 10px;
+      margin-top: 4px;
+      opacity: 0.6;
+      text-align: right;
+    }
+
+    .frappe-indicator {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      padding: 0 16px 8px;
+      min-height: 20px;
+    }
+
+    .input-zone {
+      padding: 12px 16px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-zone input {
+      flex: 1;
+      border: 1.5px solid #ddd;
+      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-zone input:focus {
+      border-color: #1a5276;
+    }
+
+    .input-zone button {
+      background: #1a5276;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.2s;
+    }
+
+    .input-zone button:hover {
+      background: #154360;
+    }
+
+    .login-zone {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .login-zone h3 {
+      color: #1a5276;
+      margin-bottom: 8px;
+    }
+
+    .login-zone input {
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .login-zone button {
+      background: #1a5276;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .login-zone button:hover {
+      background: #154360;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 13px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="chat-container">
-  <div id="login-zone">
-    <input type="text"     id="username"  placeholder="Nom d'utilisateur" />
-    <input type="password" id="password"  placeholder="Mot de passe" />
-    <input type="number"   id="conv-id"   placeholder="ID de conversation (ex: 1)" />
-    <button onclick="seConnecter()">Se connecter</button>
-  </div>
-  <div id="chat-zone" style="display:none">
-    <div class="chat-header"><div class="status-dot" id="status-dot"></div>
-      <h2>Support Client COFINANCE CI</h2>
+  <div class="chat-container">
+
+    <!-- Zone de connexion -->
+    <div id="login-zone" class="login-zone">
+      <h3>🔒 Connexion COFINANCE CI</h3>
+      <input type="text" id="username" placeholder="Nom d'utilisateur" />
+      <input type="password" id="password" placeholder="Mot de passe" />
+      <input type="number" id="conv-id" placeholder="ID de conversation (ex: 1)" />
+      <button onclick="seConnecter()">Se connecter</button>
+      <p id="erreur-login" class="error"></p>
     </div>
-    <div id="messages-zone"></div>
-    <div id="frappe-indicator"></div>
-    <div class="input-zone">
-      <input id="message-input" onkeypress="gererTouche(event)" oninput="signalerFrappe()" />
-      <button onclick="envoyerMessage()">➤</button>
+
+    <!-- Zone de chat (cachée par défaut) -->
+    <div id="chat-zone" style="display:none; flex-direction:column; height:100%;">
+      <div class="chat-header">
+        <div class="status-dot" id="status-dot"></div>
+        <div>
+          <h2>Support Client COFINANCE CI</h2>
+          <span id="nom-utilisateur"></span>
+        </div>
+      </div>
+      <div class="messages-zone" id="messages-zone"></div>
+      <div class="frappe-indicator" id="frappe-indicator"></div>
+      <div class="input-zone">
+        <input type="text" id="message-input" placeholder="Écrivez votre message..." onkeypress="gererTouche(event)"
+          oninput="signalerFrappe()" />
+        <button onclick="envoyerMessage()">➤</button>
+      </div>
     </div>
+
   </div>
-</div>
-<script>
-  let socket = null, token = null, monUserId = null;
- 
-  async function seConnecter() {
-    const resp = await fetch("/api/auth/login/", {
-      method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username: document.getElementById("username").value,
-                            password: document.getElementById("password").value})
-    });
-    const data = await resp.json();
-    token = data.access;
-    const profil = await fetch("/api/auth/profil/", {
-      headers: {"Authorization": `Bearer ${token}`}}).then(r => r.json());
-    monUserId = profil.id;
-    connecterWebSocket(document.getElementById("conv-id").value);
-  }
- 
-  function connecterWebSocket(convId) {
-    socket = new WebSocket(`ws://${window.location.host}/ws/chat/${convId}/`);
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "message") afficherMessage(data.message);
-      else if (data.type === "frappe")
-        document.getElementById("frappe-indicator").textContent =
-          `${data.auteur_nom} est en train d'écrire...`;
-    };
-  }
- 
-  function envoyerMessage() {
-    const input   = document.getElementById("message-input");
-    if (!input.value.trim()) return;
-    socket.send(JSON.stringify({type: "message", contenu: input.value}));
-    input.value = "";
-  }
-  function signalerFrappe() {
-    if (socket) socket.send(JSON.stringify({type: "frappe"}));
-  }
-</script>
-</body></html>
+
+  <script>
+    let socket = null;
+    let token = null;
+    let monUserId = null;
+    let monNom = null;
+    let frappTimer = null;
+
+    async function seConnecter() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const convId = document.getElementById('conv-id').value.trim();
+      const erreur = document.getElementById('erreur-login');
+      erreur.textContent = '';
+
+      if (!username || !password || !convId) {
+        erreur.textContent = 'Tous les champs sont obligatoires.';
+        return;
+      }
+
+      try {
+        // 1. Obtenir le token JWT
+        const respLogin = await fetch('/api/auth/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        if (!respLogin.ok) throw new Error('Identifiants incorrects.');
+        const dataLogin = await respLogin.json();
+        token = dataLogin.access;
+
+        // 2. Récupérer le profil — DOIT être fait AVANT tout le reste
+        const respProfil = await fetch('/api/auth/profil/', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const profil = await respProfil.json();
+
+        // Stocker l'ID comme entier — c'est la clé du bug
+        monUserId = parseInt(profil.id);
+        monNom = `${profil.first_name} ${profil.last_name}`;
+
+        console.log("Connecté en tant que :", monNom, "| ID :", monUserId);
+
+        // 3. Charger l'historique
+        await chargerHistorique(convId);
+
+        // 4. Ouvrir WebSocket
+        connecterWebSocket(convId);
+
+        // 5. Afficher la zone de chat
+        document.getElementById('login-zone').style.display = 'none';
+        const chatZone = document.getElementById('chat-zone');
+        chatZone.style.display = 'flex';
+        chatZone.style.flexDirection = 'column';
+        chatZone.style.height = '100%';
+        document.getElementById('nom-utilisateur').textContent = monNom;
+
+      } catch (e) {
+        document.getElementById('erreur-login').textContent = e.message;
+      }
+    }
+
+    async function chargerHistorique(convId) {
+      const resp = await fetch(`/api/chat/conversations/${convId}/messages/`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await resp.json();
+      const messages = data.results || data;
+
+      document.getElementById('messages-zone').innerHTML = '';
+
+      messages.forEach(m => {
+        console.log("Historique — auteur:", m.auteur, "| monUserId:", monUserId, "| estMoi:", parseInt(m.auteur) === monUserId);
+        afficherMessage(m);
+      });
+    }
+
+    function connecterWebSocket(convId) {
+      const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+      // On passe le token JWT dans l'URL
+      socket = new WebSocket(
+        `${proto}://${window.location.host}/ws/chat/${convId}/?token=${token}`
+      );
+
+      socket.onopen = () => {
+        document.getElementById('status-dot').style.background = '#2ecc71';
+        console.log("WebSocket connecté");
+      };
+
+      socket.onclose = () => {
+        document.getElementById('status-dot').style.background = '#e74c3c';
+        console.log("WebSocket déconnecté");
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("WebSocket reçu :", data);
+
+        if (data.type === 'message') {
+          afficherMessage(data.message);
+          document.getElementById('frappe-indicator').textContent = '';
+
+        } else if (data.type === 'frappe') {
+          if (parseInt(data.auteur_id) !== monUserId) {
+            document.getElementById('frappe-indicator').textContent =
+              `${data.auteur_nom} est en train d'écrire...`;
+            clearTimeout(frappTimer);
+            frappTimer = setTimeout(() => {
+              document.getElementById('frappe-indicator').textContent = '';
+            }, 3000);
+          }
+        }
+      };
+    }
+
+    function afficherMessage(msg) {
+      const zone = document.getElementById('messages-zone');
+
+      // Récupérer l'ID auteur — peut venir de auteur_id (WebSocket) ou auteur (API)
+      const auteurId = parseInt(msg.auteur_id !== undefined ? msg.auteur_id : msg.auteur);
+      const estMoi = auteurId === monUserId;
+
+      console.log(`Message: "${msg.contenu}" | auteurId: ${auteurId} | monUserId: ${monUserId} | estMoi: ${estMoi}`);
+
+      const div = document.createElement('div');
+      div.className = `message ${estMoi ? 'moi' : 'autre'}`;
+
+      const heure = new Date(msg.created_at).toLocaleTimeString('fr-CI', {
+        hour: '2-digit', minute: '2-digit',
+      });
+
+      div.innerHTML = `
+            ${!estMoi ? `<div class="auteur">${msg.auteur_nom || 'Interlocuteur'}</div>` : ''}
+            <div>${msg.contenu}</div>
+            <div class="heure">${heure}</div>
+        `;
+
+      zone.appendChild(div);
+      zone.scrollTop = zone.scrollHeight;
+    }
+
+    function envoyerMessage() {
+      const input = document.getElementById('message-input');
+      const contenu = input.value.trim();
+
+      if (!contenu) return;
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        alert('Connexion WebSocket perdue. Rechargez la page.');
+        return;
+      }
+
+      socket.send(JSON.stringify({ type: 'message', contenu }));
+      input.value = '';
+    }
+
+    function gererTouche(e) {
+      if (e.key === 'Enter') envoyerMessage();
+    }
+
+    function signalerFrappe() {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'frappe' }));
+      }
+    }
+  </script>
+</body>
+
+</html>

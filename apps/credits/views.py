@@ -18,7 +18,7 @@ from apps.credits.models import (
 )
 
 # Serializers — à créer dans serializers.py (voir ci-dessous)
-from .serializers import (
+from apps.credits.serializers import (
     DemandeCreditSerializer,
     ChangerStatutSerializer,
     HistoriqueStatutSerializer,

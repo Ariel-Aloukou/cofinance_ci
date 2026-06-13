@@ -45,28 +45,25 @@ class HistoriqueStatutSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class DemandeCreditSerializer(serializers.ModelSerializer):
-    client_nom = serializers.CharField(
-        source="client.get_full_name",
-        read_only=True,
-    )
-    echeances  = EcheancierSerializer(many=True, read_only=True)
+    class DemandeCreditSerializer(serializers.ModelSerializer):
+        client_nom = serializers.CharField(source="client.get_full_name", read_only=True)
+        echeances  = EcheancierSerializer(many=True, read_only=True)
 
-    class Meta:
-        model  = DemandeCredit
-        fields = [
-            "id", "client", "client_nom", "agent_traitant",
-            "montant_demande", "duree_mois", "periodicite",
-            "taux_interet_annuel", "objet_credit",
-            "statut", "score_eligibilite",
-            "montant_approuve", "commentaire_agent",
-            "date_soumission", "date_approbation", "date_decaissement",
-            "echeances",
-        ]
-        read_only_fields = [
-            "client", "statut", "score_eligibilite",
-            "date_soumission", "date_approbation", "date_decaissement",
-        ]
+        class Meta:
+            model  = DemandeCredit
+            fields = [
+                "id", "client", "client_nom", "agent_traitant",
+                "montant_demande", "duree_mois", "periodicite",
+                "taux_interet_annuel", "objet_credit",
+                "statut", "score_eligibilite",
+                "montant_approuve",          # ← plus de commentaire_agent ici
+                "date_soumission", "date_approbation", "date_decaissement",
+                "echeances",
+            ]
+            read_only_fields = [
+                "client", "statut", "score_eligibilite",
+                "date_soumission", "date_approbation", "date_decaissement",
+            ]
 
 
 class ChangerStatutSerializer(serializers.Serializer):

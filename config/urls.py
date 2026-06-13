@@ -9,6 +9,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     # ===== DOCUMENTATION API =====
+    
+    path("api/auth/", include("apps.authentication.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
@@ -20,8 +22,13 @@ urlpatterns = [
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/chat/", include("apps.chat.urls")),
     # Interface HTML chat
-   path("chat/", TemplateView.as_view(template_name="chat/chat.html"), name="chat"),
+    path("chat/", TemplateView.as_view(template_name="chat/chat.html"), name="chat"),
+     path("login/",          TemplateView.as_view(template_name="login.html"),    name="login"),
+    path("register/",       TemplateView.as_view(template_name="register.html"), name="register"),
+    path("dashboard/",      TemplateView.as_view(template_name="app.html"),      name="dashboard"),
+    path("dashboard-admin/",TemplateView.as_view(template_name="app.html"),      name="dashboard-admin"),
 ]
+
 
 # Permet d'accéder aux fichiers uploadés en mode DEBUG
 if settings.DEBUG:

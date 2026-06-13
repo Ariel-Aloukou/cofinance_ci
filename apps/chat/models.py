@@ -19,6 +19,7 @@ class Message(models.Model):
     contenu      = models.TextField()
     est_lu       = models.BooleanField(default=False)
     created_at   = models.DateTimeField(auto_now_add=True)
+    ordering = ["created_at"]
 
 class EvaluationConversation(models.Model):
     """

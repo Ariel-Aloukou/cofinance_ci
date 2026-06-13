@@ -1,7 +1,17 @@
+# apps/dashboard/urls.py
+
 from django.urls import path
-from . import views
+from .views import (
+    StatsGlobalesView,
+    ConversationsNonTraiteesView,
+)
 
 urlpatterns = [
-    # test temporaire
-    path("", lambda request: None),
+    path("stats/",
+         StatsGlobalesView.as_view(),
+         name="dashboard-stats"),
+
+    path("conversations-en-attente/",
+         ConversationsNonTraiteesView.as_view(),
+         name="dashboard-conversations-attente"),
 ]

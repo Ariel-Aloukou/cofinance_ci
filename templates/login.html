@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COFINANCE CI — Connexion</title>
+<style>
+  :root {
+    --bleu:    #1A5276;
+    --bleu2:   #2471A3;
+    --or:      #D4AC0D;
+    --bg:      #F0F4F8;
+    --blanc:   #FFFFFF;
+    --gris:    #6C7A89;
+    --rouge:   #C0392B;
+    --vert:    #1E8449;
+    --radius:  10px;
+    --shadow:  0 4px 24px rgba(26,82,118,0.13);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1A5276 0%, #2471A3 60%, #D4AC0D 100%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: var(--blanc);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    width: 100%; max-width: 420px;
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--bleu);
+    padding: 32px 32px 24px;
+    text-align: center;
+  }
+  .logo { font-size: 28px; font-weight: 800; color: var(--blanc); letter-spacing: 1px; }
+  .logo span { color: var(--or); }
+  .subtitle { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
+  .card-body { padding: 32px; }
+  .card-body h2 { font-size: 20px; color: var(--bleu); margin-bottom: 24px; font-weight: 700; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--bleu); margin-bottom: 6px; }
+  .field input {
+    width: 100%; border: 1.5px solid #D5D8DC;
+    border-radius: var(--radius); padding: 11px 14px;
+    font-size: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .field input:focus { border-color: var(--bleu2); }
+  .btn {
+    width: 100%; padding: 13px;
+    background: var(--bleu); color: var(--blanc);
+    border: none; border-radius: var(--radius);
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: background .2s;
+    margin-top: 8px;
+  }
+  .btn:hover { background: var(--bleu2); }
+  .btn:disabled { background: #AEB6BF; cursor: not-allowed; }
+  .error-box {
+    background: #FADBD8; color: var(--rouge);
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 13px; margin-bottom: 16px; display: none;
+  }
+  .link-row { text-align: center; margin-top: 20px; font-size: 13px; color: var(--gris); }
+  .link-row a { color: var(--bleu2); text-decoration: none; font-weight: 600; }
+  .link-row a:hover { text-decoration: underline; }
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">COFINANCE <span>CI</span></div>
+    <div class="subtitle">Microfinance & Assurance Mobile</div>
+  </div>
+  <div class="card-body">
+    <h2>Connexion</h2>
+    <div class="error-box" id="error-box"></div>
+    <div class="field">
+      <label>Nom d'utilisateur</label>
+      <input type="text" id="username" placeholder="ex: aya_kone" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"
+             onkeypress="if(event.key==='Enter') seConnecter()" />
+    </div>
+    <button class="btn" id="btn-login" onclick="seConnecter()">Se connecter</button>
+    <div class="link-row">
+      Pas encore inscrit ? <a href="/register/">Créer un compte</a>
+    </div>
+  </div>
+</div>
+
+<script>
+async function seConnecter() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errBox   = document.getElementById('error-box');
+  const btn      = document.getElementById('btn-login');
+
+  errBox.style.display = 'none';
+  if (!username || !password) {
+    errBox.textContent = 'Veuillez remplir tous les champs.';
+    errBox.style.display = 'block'; return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Connexion…';
+
+  try {
+    const r = await fetch('/api/auth/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || 'Identifiants incorrects.');
+
+    localStorage.setItem('token',   data.access);
+    localStorage.setItem('refresh', data.refresh);
+
+    // Récupérer le profil pour connaître le rôle
+    const rp = await fetch('/api/auth/profil/', {
+      headers: { 'Authorization': `Bearer ${data.access}` }
+    });
+    const profil = await rp.json();
+    localStorage.setItem('profil', JSON.stringify(profil));
+
+    // Redirection selon le rôle
+    if (profil.role === 'ADMIN' || profil.role === 'AGENT') {
+      window.location.href = '/dashboard-admin/';
+    } else {
+      window.location.href = '/dashboard/';
+    }
+  } catch(e) {
+    errBox.textContent = e.message;
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
+  }
+}
+
+// Si déjà connecté, rediriger
+const token = localStorage.getItem('token');
+if (token) {
+  const profil = JSON.parse(localStorage.getItem('profil') || '{}');
+  window.location.href = profil.role === 'ADMIN' || profil.role === 'AGENT'
+    ? '/dashboard-admin/' : '/dashboard/';
+}
+</script>
+</body>
+</html>

@@ -1,152 +1,118 @@
-# ROADMAP - COFINANCE CI
-
-## Phase 1 - Fondations Backend 🔨
-
-### Architecture
-
-* [x] Création du projet Django
-* [x] Mise en place de PostgreSQL
-* [x] Configuration des variables d'environnement
-* [x] Création de l'environnement virtuel
-* [x] Configuration DRF
-* [x] Configuration JWT
-* [x] Configuration DRF Spectacular
-
-### Utilisateurs
-
-* [x] Modèle utilisateur personnalisé
-* [x] Gestion des rôles CLIENT / AGENT / ADMIN
-* [x] Inscription client
-* [ ] Connexion JWT complète
-* [ ] Gestion des permissions avancées
+# Roadmap du projet COFINANCE CI
 
 ---
 
-## Phase 2 - Gestion des Microcrédits 💰
+# Version 1.0 (Terminée)
 
-### Crédit
+## Backend
 
-* [x] Modèle DemandeCredit
-* [x] HistoriqueStatutCredit
-* [x] Pièces justificatives
-* [ ] CRUD complet API
-* [ ] Validation métier complète
-* [ ] Génération automatique d'échéancier
-* [ ] Calcul avancé du score d'éligibilité
+- [x] Authentification JWT
+- [x] Gestion des rôles
+- [x] Demandes de crédit
+- [x] Workflow de validation
+- [x] Historique des statuts
+- [x] Upload des pièces justificatives
+- [x] Paiements
+- [x] Échéanciers
+- [x] Assurance
+- [x] Notifications
+- [x] Dashboard
+- [x] Chat temps réel
+- [x] Documentation Swagger
 
-### Workflow
+## Interface
 
-* [ ] Soumission demande
-* [ ] Analyse agent
-* [ ] Validation crédit
-* [ ] Décaissement
-* [ ] Historique complet des actions
-
----
-
-## Phase 3 - Assurance 🛡️
-
-### Produits
-
-* [x] Modèle FormulaAssurance
-* [x] Modèle Souscription
-* [ ] CRUD API complet
-* [ ] Gestion des renouvellements
-* [ ] Gestion des expirations
+- [x] Interface de connexion
+- [x] Interface du chat
+- [x] Liste des conversations
+- [x] Affichage des messages
+- [x] Envoi des messages
 
 ---
 
-## Phase 4 - Remboursements 💳
+# Version 1.1
 
-### Paiements
+## Améliorations
 
-* [x] Modèle Paiement
-* [ ] API Paiement
-* [ ] Validation des paiements
-* [ ] Historique des remboursements
-* [ ] Calcul automatique des pénalités
-
-### Intégration Mobile Money
-
-* [ ] Orange Money
-* [ ] MTN MoMo
-* [ ] Wave
+- [ ] Pagination des messages
+- [ ] Tri chronologique des conversations
+- [ ] Recherche dans les conversations
+- [ ] Marquage des messages lus/non lus
+- [ ] Notifications temps réel
+- [ ] Pièces jointes dans le chat
+- [ ] Emojis
 
 ---
 
-## Phase 5 - Communication 📩
+# Version 1.2
 
-### Chat
+## Tableau de bord avancé
 
-* [x] Structure de base
-* [ ] Conversation temps réel
-* [ ] Assignation automatique agent
-* [ ] Notifications de messages
-
-### Notifications
-
-* [x] Structure de base
-* [ ] Notifications crédit
-* [ ] Notifications assurance
-* [ ] Notifications remboursement
-* [ ] Notifications temps réel
+- [ ] Statistiques des remboursements
+- [ ] Taux de défaut
+- [ ] Nombre de crédits accordés
+- [ ] Graphiques interactifs
+- [ ] Export PDF
+- [ ] Export Excel
 
 ---
 
-## Phase 6 - Dashboard 📊
+# Version 1.3
 
-### Administrateur
+## Assurance
 
-* [ ] Statistiques globales
-* [ ] Nombre de crédits
-* [ ] Volume financier
-* [ ] Performance des agents
-
-### Agent
-
-* [ ] Dossiers en attente
-* [ ] Suivi des clients
-* [ ] Historique des actions
-
-### Client
-
-* [ ] Suivi des crédits
-* [ ] Suivi des remboursements
-* [ ] Contrats d'assurance
+- [ ] Renouvellement automatique
+- [ ] Historique des contrats
+- [ ] Alertes d'expiration
 
 ---
 
-## Phase 7 - Qualité & Déploiement 🚀
+# Version 1.4
 
-### Tests
+## Administration
 
-* [ ] Tests unitaires
-* [ ] Tests API
-* [ ] Tests d'intégration
-
-### Sécurité
-
-* [ ] Audit permissions
-* [ ] Validation avancée
-* [ ] Protection des endpoints
-
-### Déploiement
-
-* [ ] Docker
-* [ ] CI/CD GitHub Actions
-* [ ] Déploiement Cloud
-* [ ] Monitoring
+- [ ] Gestion complète des agents
+- [ ] Tableau de présence
+- [ ] Répartition automatique des conversations
+- [ ] Journal d'audit
 
 ---
 
-## Objectif du MVP
+---
 
-Version démontrable permettant :
+# Version 2.1
 
-* Authentification utilisateur
-* Soumission de demandes de crédit
-* Validation par agent
-* Gestion des remboursements
-* Souscription à une assurance
-* Notifications automatiques
-* Tableau de bord simplifié
+## Intelligence artificielle
+
+- [ ] Chatbot d'assistance
+- [ ] Analyse du risque de crédit
+- [ ] Recommandations automatiques
+- [ ] Détection des fraudes
+
+---
+
+# Version 3.0
+
+## Déploiement
+
+- [ ] PostgreSQL
+- [ ] Redis
+- [ ] Docker
+- [ ] Nginx
+- [ ] Gunicorn
+- [ ] CI/CD GitHub Actions
+- [ ] Déploiement Cloud
+
+---
+
+# Objectif final
+
+Construire une plateforme numérique complète de :
+
+- Microcrédits
+- Assurance mobile
+- Support client temps réel
+- Gestion administrative
+- Analyse décisionnelle
+- Application mobile
+- Intelligence artificielle
