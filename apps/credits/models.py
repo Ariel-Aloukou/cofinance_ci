@@ -18,7 +18,7 @@ class DemandeCredit(models.Model):
     client = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="credits_client"
+        related_name="demandes_credit"
     )
 
     agent_traitant = models.ForeignKey(

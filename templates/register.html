@@ -162,6 +162,7 @@ async function sInscrire() {
     }
     succBox.textContent = 'Compte créé avec succès ! Redirection…';
     succBox.style.display = 'block';
+    localStorage.clear();
     setTimeout(() => window.location.href = '/login/', 1800);
   } catch(e) {
     errBox.textContent = e.message;

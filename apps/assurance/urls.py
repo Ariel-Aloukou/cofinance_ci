@@ -2,6 +2,7 @@
 
 from django.urls import path
 from .views import (
+    FormulaCreateView,
     FormulaListView,
     FormulaDetailView,
     SouscriptionCreateView,
@@ -15,4 +16,5 @@ urlpatterns = [
     path("souscriptions/",         SouscriptionCreateView.as_view(),  name="souscription-create"),
     path("mes-souscriptions/",     MesSouscriptionsView.as_view(),    name="souscription-list"),
     path("souscriptions/<int:pk>/", SouscriptionDetailView.as_view(), name="souscription-detail"),
+    path("formules/creer/", FormulaCreateView.as_view(), name="formule-create"),
 ]

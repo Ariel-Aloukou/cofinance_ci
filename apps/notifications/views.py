@@ -10,8 +10,12 @@ from rest_framework.response import Response
 class NotificationListView(generics.ListAPIView):
     serializer_class   = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
-        return Notification.objects.filter(destinataire=self.request.user)
+        # Cette ligne est OBLIGATOIRE — filtre par utilisateur connecté
+        return Notification.objects.filter(
+            destinataire=self.request.user
+        ).order_by('-created_at')
  
 class MarquerLuView(APIView):
     permission_classes = [permissions.IsAuthenticated]

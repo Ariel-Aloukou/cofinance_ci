@@ -1,534 +1,1079 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COFINANCE CI — Mon espace</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-:root {
-  --bleu:#1A5276; --bleu2:#2471A3; --bleu-clair:#D6EAF8;
-  --or:#D4AC0D; --bg:#F0F4F8; --blanc:#FFFFFF;
-  --gris:#6C7A89; --gris2:#ECF0F1; --rouge:#C0392B;
-  --vert:#1E8449; --vert2:#D5F5E3;
-  --radius:10px; --shadow:0 2px 12px rgba(26,82,118,0.10);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #2C3E50; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COFINANCE CI — Mon espace</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bleu: #1A5276;
+      --bleu2: #2471A3;
+      --bleu-clair: #D6EAF8;
+      --or: #D4AC0D;
+      --bg: #F0F4F8;
+      --blanc: #FFFFFF;
+      --gris: #6C7A89;
+      --gris2: #ECF0F1;
+      --rouge: #C0392B;
+      --vert: #1E8449;
+      --vert2: #D5F5E3;
+      --radius: 10px;
+      --shadow: 0 2px 12px rgba(26, 82, 118, 0.10);
+    }
 
-/* ── LAYOUT ── */
-.layout { display: flex; min-height: 100vh; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* ── SIDEBAR ── */
-.sidebar {
-  width: 240px; background: var(--bleu);
-  display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; bottom: 0;
-  z-index: 100; transition: transform .3s;
-}
-.sidebar-logo {
-  padding: 24px 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-}
-.sidebar-logo .name { font-size: 20px; font-weight: 800; color: #fff; }
-.sidebar-logo .name span { color: var(--or); }
-.sidebar-logo .tagline { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
-.sidebar-user {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  display: flex; align-items: center; gap: 10px;
-}
-.avatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--or); display: flex; align-items: center;
-  justify-content: center; font-weight: 800; color: var(--bleu);
-  font-size: 14px; flex-shrink: 0;
-}
-.user-info .user-name { font-size: 13px; font-weight: 700; color: #fff; }
-.user-info .user-role {
-  font-size: 11px; color: rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.1); border-radius: 4px;
-  padding: 1px 6px; display: inline-block; margin-top: 2px;
-}
-.nav { flex: 1; padding: 12px 0; overflow-y: auto; }
-.nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 20px; color: rgba(255,255,255,0.75);
-  cursor: pointer; font-size: 13px; font-weight: 500;
-  transition: all .15s; text-decoration: none;
-  border-left: 3px solid transparent;
-}
-.nav-item:hover, .nav-item.active {
-  background: rgba(255,255,255,0.1);
-  color: #fff; border-left-color: var(--or);
-}
-.nav-item .icon { font-size: 17px; width: 20px; text-align: center; }
-.nav-section {
-  padding: 14px 20px 6px;
-  font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35);
-  text-transform: uppercase; letter-spacing: 1px;
-}
-.sidebar-footer {
-  padding: 14px 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-.btn-logout {
-  width: 100%; padding: 9px; background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.8); border: none; border-radius: var(--radius);
-  font-size: 13px; cursor: pointer; transition: background .2s;
-}
-.btn-logout:hover { background: rgba(192,57,43,0.4); color: #fff; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: #2C3E50;
+    }
 
-/* ── MAIN ── */
-.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; }
-.topbar {
-  background: var(--blanc); border-bottom: 1px solid #E8ECF0;
-  padding: 14px 28px; display: flex; align-items: center;
-  justify-content: space-between; position: sticky; top: 0; z-index: 50;
-  box-shadow: var(--shadow);
-}
-.topbar-title { font-size: 17px; font-weight: 700; color: var(--bleu); }
-.topbar-right { display: flex; align-items: center; gap: 14px; }
-.notif-badge {
-  position: relative; cursor: pointer; font-size: 20px;
-}
-.badge {
-  position: absolute; top: -4px; right: -6px;
-  background: var(--rouge); color: #fff;
-  font-size: 10px; font-weight: 700;
-  border-radius: 50%; width: 17px; height: 17px;
-  display: flex; align-items: center; justify-content: center;
-}
-.content { padding: 28px; flex: 1; }
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
 
-/* ── CARDS ── */
-.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: var(--blanc); border-radius: var(--radius);
-  padding: 20px; box-shadow: var(--shadow);
-  border-left: 4px solid var(--bleu);
-  display: flex; flex-direction: column; gap: 6px;
-}
-.stat-card.or   { border-left-color: var(--or); }
-.stat-card.vert { border-left-color: var(--vert); }
-.stat-card.rouge{ border-left-color: var(--rouge); }
-.stat-label { font-size: 12px; color: var(--gris); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
-.stat-value { font-size: 28px; font-weight: 800; color: var(--bleu); }
-.stat-card.or   .stat-value { color: #B7950B; }
-.stat-card.vert .stat-value { color: var(--vert); }
-.stat-card.rouge .stat-value { color: var(--rouge); }
-.stat-sub { font-size: 12px; color: var(--gris); }
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 240px;
+      background: var(--bleu);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      transition: transform .3s;
+    }
 
-.section-title {
-  font-size: 16px; font-weight: 700; color: var(--bleu);
-  margin-bottom: 14px; display: flex; align-items: center;
-  justify-content: space-between;
-}
-.card {
-  background: var(--blanc); border-radius: var(--radius);
-  box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px;
-}
-.card-header-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-}
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
 
-/* ── BADGES ── */
-.badge-statut {
-  padding: 3px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-}
-.badge-SOUMISE    { background: #EBF5FB; color: #2471A3; }
-.badge-EN_ANALYSE { background: #FEF9E7; color: #B7950B; }
-.badge-APPROUVEE  { background: var(--vert2); color: var(--vert); }
-.badge-DECAISSEE  { background: #D5F5E3; color: #1E8449; }
-.badge-REJETEE    { background: #FADBD8; color: var(--rouge); }
-.badge-ACTIVE     { background: var(--vert2); color: var(--vert); }
-.badge-EXPIREE    { background: #FADBD8; color: var(--rouge); }
+    .sidebar-logo .name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
 
-/* ── TABLE ── */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { background: var(--bg); color: var(--bleu); font-weight: 700; padding: 10px 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .3px; }
-td { padding: 11px 12px; border-bottom: 1px solid #EEF1F3; color: #2C3E50; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: #FAFBFC; }
+    .sidebar-logo .name span {
+      color: var(--or);
+    }
 
-/* ── FORMS ── */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 12px; font-weight: 600; color: var(--bleu); margin-bottom: 5px; }
-.field input, .field select, .field textarea {
-  width: 100%; border: 1.5px solid #D5D8DC; border-radius: var(--radius);
-  padding: 10px 13px; font-size: 13px; outline: none;
-  transition: border-color .2s; background: #fff; font-family: inherit;
-}
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--bleu2); }
-.field textarea { resize: vertical; min-height: 80px; }
+    .sidebar-logo .tagline {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
+    }
 
-/* ── BUTTONS ── */
-.btn { padding: 10px 20px; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s; }
-.btn-primary { background: var(--bleu); color: #fff; }
-.btn-primary:hover { background: var(--bleu2); }
-.btn-success { background: var(--vert); color: #fff; }
-.btn-success:hover { background: #196F3D; }
-.btn-danger  { background: var(--rouge); color: #fff; }
-.btn-outline { background: transparent; color: var(--bleu); border: 1.5px solid var(--bleu); }
-.btn-outline:hover { background: var(--bleu-clair); }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
+    .sidebar-user {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-/* ── TABS ── */
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #E8ECF0; }
-.tab {
-  padding: 9px 18px; font-size: 13px; font-weight: 600; color: var(--gris);
-  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
-  transition: all .15s;
-}
-.tab.active { color: var(--bleu); border-bottom-color: var(--bleu); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--or);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--bleu);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
 
-/* ── TIMELINE ── */
-.timeline { padding: 8px 0; }
-.timeline-item { display: flex; gap: 14px; margin-bottom: 20px; }
-.tl-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--bleu2); flex-shrink: 0; margin-top: 3px; position: relative; }
-.tl-dot::after { content:''; position:absolute; left:6px; top:14px; width:2px; height:calc(100% + 6px); background:#E8ECF0; }
-.timeline-item:last-child .tl-dot::after { display: none; }
-.tl-body .tl-title { font-size: 13px; font-weight: 700; color: var(--bleu); }
-.tl-body .tl-date  { font-size: 11px; color: var(--gris); margin-top: 2px; }
-.tl-body .tl-text  { font-size: 12px; color: #555; margin-top: 4px; }
+    .user-info .user-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
 
-/* ── MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45); z-index: 999;
-  align-items: center; justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: #fff; border-radius: 14px;
-  width: 95%; max-width: 520px;
-  max-height: 90vh; overflow-y: auto;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
-  padding: 28px;
-}
-.modal-title { font-size: 17px; font-weight: 700; color: var(--bleu); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-.modal-close { cursor: pointer; font-size: 22px; color: var(--gris); }
+    .user-info .user-role {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 1px 6px;
+      display: inline-block;
+      margin-top: 2px;
+    }
 
-/* ── NOTIFICATIONS ── */
-.notif-item {
-  display: flex; gap: 12px; align-items: flex-start;
-  padding: 12px 0; border-bottom: 1px solid #EEF1F3;
-}
-.notif-item:last-child { border-bottom: none; }
-.notif-icon { font-size: 22px; flex-shrink: 0; }
-.notif-body .notif-title { font-size: 13px; font-weight: 700; color: #2C3E50; }
-.notif-body .notif-msg   { font-size: 12px; color: var(--gris); margin-top: 2px; }
-.notif-body .notif-time  { font-size: 11px; color: #AAB7B8; margin-top: 3px; }
-.notif-item.unread .notif-title { color: var(--bleu); }
-.unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bleu2); flex-shrink: 0; margin-top: 5px; }
+    .nav {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
 
-/* ── UPLOAD ── */
-.upload-zone {
-  border: 2px dashed #AEB6BF; border-radius: var(--radius);
-  padding: 24px; text-align: center; cursor: pointer;
-  transition: border-color .2s; background: #FAFBFC;
-}
-.upload-zone:hover { border-color: var(--bleu2); }
-.upload-zone input[type=file] { display: none; }
-.upload-list { margin-top: 14px; }
-.upload-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; background: var(--vert2);
-  border-radius: var(--radius); margin-bottom: 8px; font-size: 13px;
-}
-.upload-item .icon { color: var(--vert); }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 20px;
+      color: rgba(255, 255, 255, 0.75);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .15s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
 
-/* ── EMPTY STATE ── */
-.empty-state { text-align: center; padding: 40px 20px; color: var(--gris); }
-.empty-state .icon { font-size: 42px; margin-bottom: 12px; }
-.empty-state p { font-size: 14px; }
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-left-color: var(--or);
+    }
 
-/* ── SPINNER ── */
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+    .nav-item .icon {
+      font-size: 17px;
+      width: 20px;
+      text-align: center;
+    }
 
-/* ── TOAST ── */
-#toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: #2C3E50; color: #fff;
-  padding: 12px 20px; border-radius: var(--radius);
-  font-size: 13px; z-index: 9999;
-  transform: translateY(80px); opacity: 0;
-  transition: all .3s; pointer-events: none;
-}
-#toast.show { transform: translateY(0); opacity: 1; }
-#toast.success { background: var(--vert); }
-#toast.error   { background: var(--rouge); }
+    .nav-section {
+      padding: 14px 20px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; }
-  .form-grid { grid-template-columns: 1fr; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-}
-</style>
+    .sidebar-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 9px;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(192, 57, 43, 0.4);
+      color: #fff;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: var(--blanc);
+      border-bottom: 1px solid #E8ECF0;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--bleu);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .notif-badge {
+      position: relative;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      background: var(--rouge);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 17px;
+      height: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content {
+      padding: 28px;
+      flex: 1;
+    }
+
+    /* ── CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--bleu);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-card.or {
+      border-left-color: var(--or);
+    }
+
+    .stat-card.vert {
+      border-left-color: var(--vert);
+    }
+
+    .stat-card.rouge {
+      border-left-color: var(--rouge);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--gris);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--bleu);
+    }
+
+    .stat-card.or .stat-value {
+      color: #B7950B;
+    }
+
+    .stat-card.vert .stat-value {
+      color: var(--vert);
+    }
+
+    .stat-card.rouge .stat-value {
+      color: var(--rouge);
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--gris);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--bleu);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* ── BADGES ── */
+    .badge-statut {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-SOUMISE {
+      background: #EBF5FB;
+      color: #2471A3;
+    }
+
+    .badge-EN_ANALYSE {
+      background: #FEF9E7;
+      color: #B7950B;
+    }
+
+    .badge-APPROUVEE {
+      background: var(--vert2);
+      color: var(--vert);
+    }
+
+    .badge-DECAISSEE {
+      background: #D5F5E3;
+      color: #1E8449;
+    }
+
+    .badge-REJETEE {
+      background: #FADBD8;
+      color: var(--rouge);
+    }
+
+    .badge-ACTIVE {
+      background: var(--vert2);
+      color: var(--vert);
+    }
+
+    .badge-EXPIREE {
+      background: #FADBD8;
+      color: var(--rouge);
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--bleu);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #EEF1F3;
+      color: #2C3E50;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #FAFBFC;
+    }
+
+    /* ── FORMS ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--bleu);
+      margin-bottom: 5px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1.5px solid #D5D8DC;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s;
+      background: #fff;
+      font-family: inherit;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--bleu2);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .btn-primary {
+      background: var(--bleu);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--bleu2);
+    }
+
+    .btn-success {
+      background: var(--vert);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #196F3D;
+    }
+
+    .btn-danger {
+      background: var(--rouge);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--bleu);
+      border: 1.5px solid var(--bleu);
+    }
+
+    .btn-outline:hover {
+      background: var(--bleu-clair);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #E8ECF0;
+    }
+
+    .tab {
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gris);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all .15s;
+    }
+
+    .tab.active {
+      color: var(--bleu);
+      border-bottom-color: var(--bleu);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      padding: 8px 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .tl-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--bleu2);
+      flex-shrink: 0;
+      margin-top: 3px;
+      position: relative;
+    }
+
+    .tl-dot::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 14px;
+      width: 2px;
+      height: calc(100% + 6px);
+      background: #E8ECF0;
+    }
+
+    .timeline-item:last-child .tl-dot::after {
+      display: none;
+    }
+
+    .tl-body .tl-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--bleu);
+    }
+
+    .tl-body .tl-date {
+      font-size: 11px;
+      color: var(--gris);
+      margin-top: 2px;
+    }
+
+    .tl-body .tl-text {
+      font-size: 12px;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      width: 95%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+      padding: 28px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--bleu);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      font-size: 22px;
+      color: var(--gris);
+    }
+
+    /* ── NOTIFICATIONS ── */
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #EEF1F3;
+    }
+
+    .notif-item:last-child {
+      border-bottom: none;
+    }
+
+    .notif-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .notif-body .notif-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2C3E50;
+    }
+
+    .notif-body .notif-msg {
+      font-size: 12px;
+      color: var(--gris);
+      margin-top: 2px;
+    }
+
+    .notif-body .notif-time {
+      font-size: 11px;
+      color: #AAB7B8;
+      margin-top: 3px;
+    }
+
+    .notif-item.unread .notif-title {
+      color: var(--bleu);
+    }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--bleu2);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    /* ── UPLOAD ── */
+    .upload-zone {
+      border: 2px dashed #AEB6BF;
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s;
+      background: #FAFBFC;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--bleu2);
+    }
+
+    .upload-zone input[type=file] {
+      display: none;
+    }
+
+    .upload-list {
+      margin-top: 14px;
+    }
+
+    .upload-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--vert2);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .upload-item .icon {
+      color: var(--vert);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gris);
+    }
+
+    .empty-state .icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* ── SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #2C3E50;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #toast.success {
+      background: var(--vert);
+    }
+
+    #toast.error {
+      background: var(--rouge);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="layout">
+  <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="name">COFINANCE <span>CI</span></div>
-      <div class="tagline">Microfinance & Assurance Mobile</div>
-    </div>
-    <div class="sidebar-user">
-      <div class="avatar" id="nav-avatar">?</div>
-      <div class="user-info">
-        <div class="user-name" id="nav-username">Chargement…</div>
-        <div class="user-role" id="nav-role">—</div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="name">COFINANCE <span>CI</span></div>
+        <div class="tagline">Microfinance & Assurance Mobile</div>
       </div>
-    </div>
-    <nav class="nav" id="nav-links">
-      <!-- rempli par JS selon le rôle -->
-    </nav>
-    <div class="sidebar-footer">
-      <button class="btn-logout" onclick="seDeconnecter()">🚪 Se déconnecter</button>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-title" id="page-title">Tableau de bord</div>
-      <div class="topbar-right">
-        <div class="notif-badge" onclick="afficherPage('notifications')" title="Notifications">
-          🔔 <span class="badge" id="notif-count" style="display:none">0</span>
+      <div class="sidebar-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="nav-username">Chargement…</div>
+          <div class="user-role" id="nav-role">—</div>
         </div>
-        <div style="font-size:13px;color:var(--gris)" id="topbar-name"></div>
       </div>
-    </div>
+      <nav class="nav" id="nav-links">
+        <!-- rempli par JS selon le rôle -->
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="seDeconnecter()">🚪 Se déconnecter</button>
+      </div>
+    </aside>
 
-    <div class="content" id="page-content">
-      <!-- contenu injecté par JS -->
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Tableau de bord</div>
+        <div class="topbar-right">
+          <div class="notif-badge" onclick="afficherPage('notifications')" title="Notifications">
+            🔔 <span class="badge" id="notif-count" style="display:none">0</span>
+          </div>
+          <div style="font-size:13px;color:var(--gris)" id="topbar-name"></div>
+        </div>
+      </div>
+
+      <div class="content" id="page-content">
+        <!-- contenu injecté par JS -->
+      </div>
     </div>
   </div>
-</div>
 
-<!-- TOAST -->
-<div id="toast"></div>
+  <!-- TOAST -->
+  <div id="toast"></div>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-credit">
-  <div class="modal">
-    <div class="modal-title">
-      Nouvelle demande de crédit
-      <span class="modal-close" onclick="fermerModal('modal-credit')">×</span>
-    </div>
-    <div class="form-grid">
-      <div class="field">
-        <label>Montant demandé (FCFA) *</label>
-        <input type="number" id="f-montant" placeholder="500000" min="10000" />
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modal-credit">
+    <div class="modal">
+      <div class="modal-title">
+        Nouvelle demande de crédit
+        <span class="modal-close" onclick="fermerModal('modal-credit')">×</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Montant demandé (FCFA) *</label>
+          <input type="number" id="f-montant" placeholder="500000" min="10000" />
+        </div>
+        <div class="field">
+          <label>Durée (mois) *</label>
+          <input type="number" id="f-duree" placeholder="12" min="1" max="60" />
+        </div>
       </div>
       <div class="field">
-        <label>Durée (mois) *</label>
-        <input type="number" id="f-duree" placeholder="12" min="1" max="60" />
+        <label>Périodicité *</label>
+        <select id="f-periodicite">
+          <option value="MENSUEL">Mensuelle</option>
+          <option value="HEBDOMADAIRE">Hebdomadaire</option>
+        </select>
       </div>
+      <div class="field">
+        <label>Objet du crédit *</label>
+        <textarea id="f-objet" placeholder="Décrivez l'usage prévu du crédit…"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="soumettreCredit()" id="btn-submit-credit">Soumettre la demande</button>
     </div>
-    <div class="field">
-      <label>Périodicité *</label>
-      <select id="f-periodicite">
-        <option value="MENSUEL">Mensuelle</option>
-        <option value="HEBDOMADAIRE">Hebdomadaire</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Objet du crédit *</label>
-      <textarea id="f-objet" placeholder="Décrivez l'usage prévu du crédit…"></textarea>
-    </div>
-    <button class="btn btn-primary" onclick="soumettreCredit()" id="btn-submit-credit">Soumettre la demande</button>
   </div>
-</div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
-// UTILITAIRES
-// ═══════════════════════════════════════════════════════════
-const API = (path, opts={}) => {
-  const token = localStorage.getItem('token');
-  return fetch('/api' + path, {
-    ...opts,
-    headers: {
-      ...(opts.headers || {}),
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...(opts.body && !(opts.body instanceof FormData)
-        ? { 'Content-Type': 'application/json' } : {}),
-    },
-  });
-};
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // UTILITAIRES
+    // ═══════════════════════════════════════════════════════════
+    const API = (path, opts = {}) => {
+      const token = localStorage.getItem('token');
+      return fetch('/api' + path, {
+        ...opts,
+        headers: {
+          ...(opts.headers || {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          ...(opts.body && !(opts.body instanceof FormData)
+            ? { 'Content-Type': 'application/json' } : {}),
+        },
+      });
+    };
 
-function toast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'show ' + type;
-  setTimeout(() => t.className = '', 3000);
-}
+    function toast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'show ' + type;
+      setTimeout(() => t.className = '', 3000);
+    }
 
-function badgeStatut(s) {
-  return `<span class="badge-statut badge-${s}">${s.replace('_',' ')}</span>`;
-}
+    function badgeStatut(s) {
+      return `<span class="badge-statut badge-${s}">${s.replace('_', ' ')}</span>`;
+    }
 
-function formatDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr-CI');
-}
+    function formatDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('fr-CI');
+    }
 
-function formatMontant(n) {
-  return Number(n).toLocaleString('fr-CI') + ' FCFA';
-}
+    function formatMontant(n) {
+      return Number(n).toLocaleString('fr-CI') + ' FCFA';
+    }
 
-function fermerModal(id) { document.getElementById(id).classList.remove('open'); }
-function ouvrirModal(id)  { document.getElementById(id).classList.add('open'); }
+    function fermerModal(id) { document.getElementById(id).classList.remove('open'); }
+    function ouvrirModal(id) { document.getElementById(id).classList.add('open'); }
 
-function seDeconnecter() {
-  localStorage.clear();
-  window.location.href = '/login/';
-}
+    function seDeconnecter() {
+      localStorage.clear();
+      window.location.href = '/login/';
+    }
 
-// ═══════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════
-const profil = JSON.parse(localStorage.getItem('profil') || 'null');
-if (!profil) { window.location.href = '/login/'; }
+    // ═══════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════
+    const profil = JSON.parse(localStorage.getItem('profil') || 'null');
+    if (!profil) { window.location.href = '/login/'; }
 
-const estAdmin = profil && (profil.role === 'ADMIN' || profil.role === 'AGENT');
+    const estAdmin = profil && (profil.role === 'ADMIN' || profil.role === 'AGENT');
 
-// Remplir l'en-tête sidebar
-document.getElementById('nav-avatar').textContent =
-  (profil.first_name?.[0] || '') + (profil.last_name?.[0] || '');
-document.getElementById('nav-username').textContent =
-  profil.first_name + ' ' + profil.last_name;
-document.getElementById('nav-role').textContent = profil.role;
-document.getElementById('topbar-name').textContent =
-  profil.first_name + ' ' + profil.last_name;
+    // Remplir l'en-tête sidebar
+    document.getElementById('nav-avatar').textContent =
+      (profil.first_name?.[0] || '') + (profil.last_name?.[0] || '');
+    document.getElementById('nav-username').textContent =
+      profil.first_name + ' ' + profil.last_name;
+    document.getElementById('nav-role').textContent = profil.role;
+    document.getElementById('topbar-name').textContent =
+      profil.first_name + ' ' + profil.last_name;
 
-// Navigation selon le rôle
-const navClient = [
-  { icon:'🏠', label:'Tableau de bord', page:'dashboard' },
-  { icon:'💳', label:'Mes crédits',     page:'credits' },
-  { icon:'🛡️', label:'Assurance',       page:'assurance' },
-  { icon:'🔔', label:'Notifications',   page:'notifications' },
-  { icon:'💬', label:'Support chat',    page:'chat' },
-];
-const navAdmin = [
-  { icon:'📊', label:'Tableau de bord', page:'dashboard' },
-  { icon:'💳', label:'Crédits',         page:'credits' },
-  { icon:'💰', label:'Remboursements',  page:'remboursements' },
-  { icon:'🛡️', label:'Assurance',       page:'assurance' },
-  { icon:'💬', label:'Support chat',    page:'chat' },
-  { icon:'🔔', label:'Notifications',   page:'notifications' },
-];
-const navItems = estAdmin ? navAdmin : navClient;
-const navEl = document.getElementById('nav-links');
-navItems.forEach(item => {
-  const a = document.createElement('a');
-  a.className = 'nav-item'; a.dataset.page = item.page;
-  a.innerHTML = `<span class="icon">${item.icon}</span>${item.label}`;
-  a.onclick = (e) => { e.preventDefault(); afficherPage(item.page); };
-  navEl.appendChild(a);
-});
+    // Navigation selon le rôle
+    const navClient = [
+      { icon: '🏠', label: 'Tableau de bord', page: 'dashboard' },
+      { icon: '💳', label: 'Mes crédits', page: 'credits' },
+      { icon: '🛡️', label: 'Assurance', page: 'assurance' },
+      { icon: '🔔', label: 'Notifications', page: 'notifications' },
+      { icon: '💬', label: 'Support chat', page: 'chat' },
+    ];
+    const navAdmin = [
+      { icon: '📊', label: 'Tableau de bord', page: 'dashboard' },
+      { icon: '💳', label: 'Crédits', page: 'credits' },
+      { icon: '💰', label: 'Remboursements', page: 'remboursements' },
+      { icon: '🛡️', label: 'Assurance', page: 'assurance' },
+      { icon: '💬', label: 'Support chat', page: 'chat' },
+      { icon: '🔔', label: 'Notifications', page: 'notifications' },
+    ];
+    const navItems = estAdmin ? navAdmin : navClient;
+    const navEl = document.getElementById('nav-links');
+    navItems.forEach(item => {
+      const a = document.createElement('a');
+      a.className = 'nav-item'; a.dataset.page = item.page;
+      a.innerHTML = `<span class="icon">${item.icon}</span>${item.label}`;
+      a.onclick = (e) => { e.preventDefault(); afficherPage(item.page); };
+      navEl.appendChild(a);
+    });
 
-// Charger le nombre de notifications non lues
-async function chargerNotifCount() {
-  try {
-    const r = await API('/notifications/');
-    const d = await r.json();
-    const items = d.results || d;
-    const nonLues = items.filter(n => !n.est_lu).length;
-    const badge = document.getElementById('notif-count');
-    if (nonLues > 0) { badge.textContent = nonLues; badge.style.display = 'flex'; }
-  } catch(e) {}
-}
-chargerNotifCount();
+    // Charger le nombre de notifications non lues
+    async function chargerNotifCount() {
+      try {
+        const r = await API('/notifications/');
+        if (!r.ok) return;
+        const d = await r.json();
+        const items = d.results || d;
+        // Filtrer uniquement les vraies non-lues avec un titre
+        const nonLues = items.filter(n => !n.est_lu && n.titre).length;
+        const badge = document.getElementById('notif-count');
+        if (nonLues > 0) {
+          badge.textContent = nonLues;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      } catch (e) { }
+    }
+    chargerNotifCount();
 
-// ═══════════════════════════════════════════════════════════
-// ROUTER
-// ═══════════════════════════════════════════════════════════
-function afficherPage(page) {
-  document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
-  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-  const pages = {
-    dashboard:      estAdmin ? pageDashboardAdmin : pageDashboardClient,
-    credits:        pageCredits,
-    assurance:      pageAssurance,
-    notifications:  pageNotifications,
-    chat:           pageChat,
-    remboursements: pageRemboursements,
-  };
-  (pages[page] || pageDashboardClient)();
-}
+    // ═══════════════════════════════════════════════════════════
+    // ROUTER
+    // ═══════════════════════════════════════════════════════════
+    function afficherPage(page) {
+      // Arrêter le rafraîchissement du chat si on change de page
+      if (window._chatRefreshInterval) {
+        clearInterval(window._chatRefreshInterval);
+        window._chatRefreshInterval = null;
+      }
+      document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+      document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+      const pages = {
+        dashboard: estAdmin ? pageDashboardAdmin : pageDashboardClient,
+        credits: pageCredits,
+        assurance: pageAssurance,
+        notifications: pageNotifications,
+        chat: pageChat,
+        remboursements: pageRemboursements,
+      };
+      (pages[page] || pageDashboardClient)();
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : DASHBOARD CLIENT
-// ═══════════════════════════════════════════════════════════
-async function pageDashboardClient() {
-  document.getElementById('page-title').textContent = 'Tableau de bord';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : DASHBOARD CLIENT
+    // ═══════════════════════════════════════════════════════════
+    async function pageDashboardClient() {
+      document.getElementById('page-title').textContent = 'Tableau de bord';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div style="margin-bottom:8px;font-size:18px;font-weight:700;color:var(--bleu)">
       Bonjour, ${profil.first_name} ${profil.last_name} 👋
     </div>
     <div style="color:var(--gris);font-size:13px;margin-bottom:24px">
       Bienvenue sur votre espace COFINANCE CI
     </div>
-    <div class="stat-grid" id="stat-grid">
+    <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">Crédits</div><div class="stat-value" id="s-credits">…</div></div>
       <div class="stat-card or"><div class="stat-label">Assurances actives</div><div class="stat-value" id="s-assurances">…</div></div>
-      <div class="stat-card vert"><div class="stat-label">Notifications</div><div class="stat-value" id="s-notifs">…</div></div>
+      <div class="stat-card vert"><div class="stat-label">Notifications non lues</div><div class="stat-value" id="s-notifs">…</div></div>
     </div>
 
     <div class="section-title">
       Mes crédits récents
-      <button class="btn btn-primary btn-sm" onclick="ouvrirModal('modal-credit')">+ Nouveau crédit</button>
+      ${!estAdmin ? `<button class="btn btn-primary btn-sm" onclick="ouvrirModal('modal-credit')">+ Nouveau crédit</button>` : ''}
     </div>
     <div class="card" id="credits-rapide">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
     </div>
+
+    <!-- ← Zone de détail AJOUTÉE ici -->
+    <div id="detail-credit-zone"></div>
   `;
 
-  // Charger stats
-  try {
-    const [rc, ra, rn] = await Promise.all([
-      API('/credits/demandes/'),
-      API('/assurance/mes-souscriptions/'),
-      API('/notifications/'),
-    ]);
-    const [credits, assurances, notifs] = await Promise.all([rc.json(), ra.json(), rn.json()]);
-    const cl = (credits.results || credits);
-    const al = (assurances.results || assurances);
-    const nl = (notifs.results || notifs);
+      // Charger stats
+      try {
+        const [rc, ra, rn] = await Promise.all([
+          API('/credits/demandes/'),
+          API('/assurance/mes-souscriptions/'),
+          API('/notifications/'),
+        ]);
+        const [credits, assurances, notifs] = await Promise.all([rc.json(), ra.json(), rn.json()]);
+        const cl = (credits.results || credits);
+        const al = (assurances.results || assurances);
+        const nl = (notifs.results || notifs);
 
-    document.getElementById('s-credits').textContent = cl.length;
-    document.getElementById('s-assurances').textContent = al.length;
-    document.getElementById('s-notifs').textContent = nl.filter(n=>!n.est_lu).length;
+        document.getElementById('s-credits').textContent = cl.length;
+        document.getElementById('s-assurances').textContent = al.length;
+        document.getElementById('s-notifs').textContent = nl.filter(n => !n.est_lu).length;
 
-    // Crédits récents
-    if (cl.length === 0) {
-      document.getElementById('credits-rapide').innerHTML = `
+        // Crédits récents
+        if (cl.length === 0) {
+          document.getElementById('credits-rapide').innerHTML = `
         <div class="empty-state">
           <div class="icon">💳</div>
           <p>Aucun crédit pour l'instant.</p>
           <button class="btn btn-primary" style="margin-top:14px" onclick="ouvrirModal('modal-credit')">Faire une demande</button>
         </div>`;
-    } else {
-      document.getElementById('credits-rapide').innerHTML = `
+        } else {
+          document.getElementById('credits-rapide').innerHTML = `
         <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>Montant</th><th>Durée</th><th>Statut</th><th>Date</th><th></th></tr></thead>
           <tbody>
-            ${cl.slice(0,5).map(cr => `
+            ${cl.slice(0, 5).map(cr => `
               <tr>
                 <td><strong>#${cr.id}</strong></td>
                 <td>${formatMontant(cr.montant_demande)}</td>
@@ -539,42 +1084,48 @@ async function pageDashboardClient() {
               </tr>`).join('')}
           </tbody>
         </table></div>`;
+        }
+      } catch (e) { console.error(e); }
     }
-  } catch(e) { console.error(e); }
-}
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : CRÉDITS CLIENT
-// ═══════════════════════════════════════════════════════════
-async function pageCredits() {
-  document.getElementById('page-title').textContent = 'Mes crédits';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : CRÉDITS CLIENT
+    // ═══════════════════════════════════════════════════════════
+    async function pageCredits() {
+      document.getElementById('page-title').textContent = 'Mes crédits';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div class="section-title">
       Mes demandes de crédit
-      <button class="btn btn-primary btn-sm" onclick="ouvrirModal('modal-credit')">+ Nouvelle demande</button>
+      ${!estAdmin ? `<button class="btn btn-primary btn-sm" onclick="ouvrirModal('modal-credit')">+ Nouvelle demande</button>` : ''}
     </div>
     <div class="card" id="liste-credits">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
     </div>
     <div id="detail-credit-zone"></div>
+    
   `;
+      // Dans pageCredits(), après le tableau des crédits, ajouter
+      `<div style="margin-top:12px">
+      <button class="btn btn-outline btn-sm" onclick="afficherPage('assurance')">
+        🛡️ Voir mes polices d'assurance
+      </button>
+    </div>`
+      try {
+        const r = await API('/credits/demandes/');
+        const d = await r.json();
+        const credits = d.results || d;
 
-  try {
-    const r = await API('/credits/demandes/');
-    const d = await r.json();
-    const credits = d.results || d;
-
-    if (credits.length === 0) {
-      document.getElementById('liste-credits').innerHTML = `
+        if (credits.length === 0) {
+          document.getElementById('liste-credits').innerHTML = `
         <div class="empty-state">
           <div class="icon">💳</div><p>Aucune demande de crédit.</p>
           <button class="btn btn-primary" style="margin-top:14px" onclick="ouvrirModal('modal-credit')">Faire ma première demande</button>
         </div>`;
-      return;
-    }
+          return;
+        }
 
-    document.getElementById('liste-credits').innerHTML = `
+        document.getElementById('liste-credits').innerHTML = `
       <div class="table-wrap"><table>
         <thead><tr><th>#</th><th>Montant demandé</th><th>Approuvé</th><th>Durée</th><th>Statut</th><th>Score</th><th>Date</th><th></th></tr></thead>
         <tbody>
@@ -591,30 +1142,30 @@ async function pageCredits() {
             </tr>`).join('')}
         </tbody>
       </table></div>`;
-  } catch(e) { console.error(e); }
-}
+      } catch (e) { console.error(e); }
+    }
 
-async function voirDetailCredit(id) {
-  const zone = document.getElementById('detail-credit-zone') || document.getElementById('page-content');
+    async function voirDetailCredit(id) {
+      const zone = document.getElementById('detail-credit-zone') || document.getElementById('page-content');
 
-  // Charger crédit + historique + échéancier + pièces
-  const [rc, rh, re, rp] = await Promise.all([
-    API(`/credits/demandes/${id}/`),
-    API(`/credits/demandes/${id}/historique/`),
-    API(`/credits/demandes/${id}/echeancier/`),
-    API(`/credits/demandes/${id}/pieces/`),
-  ]);
-  const [credit, historique, echeancier, pieces] = await Promise.all([
-    rc.json(), rh.json(), re.json(), rp.json()
-  ]);
-  const ech = echeancier.results || echeancier;
-  const hist = historique.results || historique;
-  const pcs  = pieces.results || pieces;
+      // Charger crédit + historique + échéancier + pièces
+      const [rc, rh, re, rp] = await Promise.all([
+        API(`/credits/demandes/${id}/`),
+        API(`/credits/demandes/${id}/historique/`),
+        API(`/credits/demandes/${id}/echeancier/`),
+        API(`/credits/demandes/${id}/pieces/`),
+      ]);
+      const [credit, historique, echeancier, pieces] = await Promise.all([
+        rc.json(), rh.json(), re.json(), rp.json()
+      ]);
+      const ech = echeancier.results || echeancier;
+      const hist = historique.results || historique;
+      const pcs = pieces.results || pieces;
 
-  const detailZone = document.getElementById('detail-credit-zone');
-  if (!detailZone) return;
+      const detailZone = document.getElementById('detail-credit-zone');
+      if (!detailZone) return;
 
-  detailZone.innerHTML = `
+      detailZone.innerHTML = `
     <div class="section-title" style="margin-top:24px">
       Détail — Crédit #${id}
       <span onclick="document.getElementById('detail-credit-zone').innerHTML=''" style="cursor:pointer;font-size:13px;color:var(--gris)">✕ Fermer</span>
@@ -637,8 +1188,8 @@ async function voirDetailCredit(id) {
       <div class="tab-content active" id="t-historique">
         <div class="timeline">
           ${hist.length === 0
-            ? '<div class="empty-state"><p>Aucun changement de statut.</p></div>'
-            : hist.map(h => `
+          ? '<div class="empty-state"><p>Aucun changement de statut.</p></div>'
+          : hist.map(h => `
               <div class="timeline-item">
                 <div class="tl-dot"></div>
                 <div class="tl-body">
@@ -693,8 +1244,8 @@ async function voirDetailCredit(id) {
         </div>
         <div class="upload-list" id="pieces-list-${id}">
           ${pcs.length === 0
-            ? '<div class="empty-state"><p>Aucun document uploadé.</p></div>'
-            : pcs.map(p => `
+          ? '<div class="empty-state"><p>Aucun document uploadé.</p></div>'
+          : pcs.map(p => `
                 <div class="upload-item">
                   <span class="icon">✓</span>
                   <span style="flex:1">${p.nom_original || p.type_document}</span>
@@ -704,79 +1255,83 @@ async function voirDetailCredit(id) {
       </div>
     </div>
   `;
-}
+    }
 
-async function uploadPiece(demandeId, input) {
-  const file = input.files[0];
-  if (!file) return;
-  const type = document.getElementById(`type-doc-${demandeId}`).value;
-  const fd   = new FormData();
-  fd.append('fichier', file);
-  fd.append('type_document', type);
-  fd.append('demande', demandeId);
+    async function uploadPiece(demandeId, input) {
+      const file = input.files[0];
+      if (!file) return;
+      const type = document.getElementById(`type-doc-${demandeId}`).value;
+      const fd = new FormData();
+      fd.append('fichier', file);
+      fd.append('type_document', type);
+      fd.append('demande', demandeId);
 
-  toast('Upload en cours…');
-  try {
-    const r = await API(`/credits/demandes/${demandeId}/pieces/upload/`, {
-      method: 'POST', body: fd,
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(JSON.stringify(d));
-    toast('Document uploadé !', 'success');
-    // Rafraîchir la liste
-    const rp = await API(`/credits/demandes/${demandeId}/pieces/`);
-    const pcs = (await rp.json()).results || await rp.json();
-    document.getElementById(`pieces-list-${demandeId}`).innerHTML =
-      pcs.map(p => `
+      toast('Upload en cours…');
+      try {
+        const r = await API(`/credits/demandes/${demandeId}/pieces/upload/`, {
+          method: 'POST', body: fd,
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(JSON.stringify(d));
+        toast('Document uploadé !', 'success');
+        // Rafraîchir la liste
+        const rp = await API(`/credits/demandes/${demandeId}/pieces/`);
+        const pcs = (await rp.json()).results || await rp.json();
+        document.getElementById(`pieces-list-${demandeId}`).innerHTML =
+          pcs.map(p => `
         <div class="upload-item">
           <span class="icon">✓</span>
           <span style="flex:1">${p.nom_original || p.type_document}</span>
           <a href="${p.url_telechargement}" target="_blank" style="font-size:12px;color:var(--bleu2)">Télécharger</a>
         </div>`).join('');
-  } catch(e) { toast('Erreur upload : ' + e.message, 'error'); }
-}
+      } catch (e) { toast('Erreur upload : ' + e.message, 'error'); }
+    }
 
-function switchTab(e, targetId) {
-  const card = e.target.closest('.card');
-  card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  card.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  e.target.classList.add('active');
-  card.querySelector('#' + targetId).classList.add('active');
-}
+    function switchTab(e, targetId) {
+      const card = e.target.closest('.card');
+      card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      card.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      card.querySelector('#' + targetId).classList.add('active');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// SOUMETTRE UN CRÉDIT
-// ═══════════════════════════════════════════════════════════
-async function soumettreCredit() {
-  const btn = document.getElementById('btn-submit-credit');
-  const payload = {
-    montant_demande: document.getElementById('f-montant').value,
-    duree_mois:      document.getElementById('f-duree').value,
-    periodicite:     document.getElementById('f-periodicite').value,
-    objet_credit:    document.getElementById('f-objet').value,
-  };
-  if (!payload.montant_demande || !payload.duree_mois || !payload.objet_credit) {
-    toast('Veuillez remplir tous les champs.', 'error'); return;
-  }
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi…';
-  try {
-    const r = await API('/credits/demandes/', { method:'POST', body: JSON.stringify(payload) });
-    const d = await r.json();
-    if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
-    toast('Demande soumise avec succès !', 'success');
-    fermerModal('modal-credit');
-    pageCredits();
-  } catch(e) { toast(e.message, 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'Soumettre la demande'; }
-}
+    // ═══════════════════════════════════════════════════════════
+    // SOUMETTRE UN CRÉDIT
+    // ═══════════════════════════════════════════════════════════
+    async function soumettreCredit() {
+      const btn = document.getElementById('btn-submit-credit');
+      const payload = {
+        montant_demande: document.getElementById('f-montant').value,
+        duree_mois: document.getElementById('f-duree').value,
+        periodicite: document.getElementById('f-periodicite').value,
+        objet_credit: document.getElementById('f-objet').value,
+      };
+      if (!payload.montant_demande || !payload.duree_mois || !payload.objet_credit) {
+        toast('Veuillez remplir tous les champs.', 'error'); return;
+      }
+      btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi…';
+      try {
+        const r = await API('/credits/demandes/', { method: 'POST', body: JSON.stringify(payload) });
+        const d = await r.json();
+        if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
+        toast('Demande soumise avec succès !', 'success');
+        fermerModal('modal-credit');
+        pageCredits();
+      } catch (e) { toast(e.message, 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Soumettre la demande'; }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : ASSURANCE
-// ═══════════════════════════════════════════════════════════
-async function pageAssurance() {
-  document.getElementById('page-title').textContent = 'Assurance';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : ASSURANCE
+    // ═══════════════════════════════════════════════════════════
+    async function pageAssurance() {
+      document.getElementById('page-title').textContent = 'Assurance';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
+      ${estAdmin ? `
+      <div style="margin-bottom:16px">
+        <button class="btn btn-primary" onclick="ouvrirModal('modal-new-formule')">+ Nouvelle formule</button>
+     </div>` : ''}
     <div class="tabs">
       <div class="tab active" onclick="switchTabGlobal(event,'t-catalogue')">📋 Catalogue</div>
       <div class="tab" onclick="switchTabGlobal(event,'t-mes-polices')">🛡️ Mes polices</div>
@@ -789,80 +1344,93 @@ async function pageAssurance() {
     </div>
   `;
 
-  // Catalogue
-  try {
-    const r = await API('/assurance/formules/');
-    const d = await r.json();
-    const formules = d.results || d;
-    document.getElementById('t-catalogue').innerHTML = formules.length === 0
-      ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune formule disponible.</p></div>'
-      : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
-          ${formules.map(f => `
-            <div class="card" style="border-top:4px solid var(--bleu);padding:20px">
-              <div style="font-size:16px;font-weight:800;color:var(--bleu);margin-bottom:6px">${f.nom}</div>
-              <div style="font-size:12px;color:var(--gris);margin-bottom:14px">${f.description}</div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-                <div><div style="font-size:11px;color:var(--gris)">Prime mensuelle</div><div style="font-weight:800;color:var(--or)">${formatMontant(f.prime_mensuelle)}</div></div>
-                <div><div style="font-size:11px;color:var(--gris)">Capital garanti</div><div style="font-weight:800;color:var(--vert)">${formatMontant(f.capital_garanti)}</div></div>
-              </div>
-              <div style="font-size:12px;color:var(--gris);margin-bottom:14px">Durée : ${f.duree_mois} mois</div>
-              ${!estAdmin ? `<button class="btn btn-success" style="width:100%" onclick="souscrire(${f.id},'${f.nom}')">Souscrire</button>` : ''}
-            </div>`).join('')}
+      try {
+        // Charger catalogue ET souscriptions en même temps
+        const [rf, rs] = await Promise.all([
+          API('/assurance/formules/'),
+          API('/assurance/mes-souscriptions/'),
+        ]);
+        const formules = (await rf.json()).results || await rf.json();
+        const polices = (await rs.json()).results || await rs.json();
+
+        // IDs des formules déjà souscrites
+        const dejaSouscrits = new Set(polices.map(p => p.formule));
+
+        document.getElementById('t-catalogue').innerHTML = formules.length === 0
+          ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune formule disponible.</p></div>'
+          : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+          ${formules.map(f => {
+            const dejaFait = dejaSouscrits.has(f.id);
+            return `
+              <div class="card" style="border-top:4px solid ${dejaFait ? 'var(--vert)' : 'var(--bleu)'};padding:20px">
+                <div style="font-size:16px;font-weight:800;color:var(--bleu);margin-bottom:6px">${f.nom}</div>
+                <div style="font-size:12px;color:var(--gris);margin-bottom:14px">${f.description}</div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+                  <div>
+                    <div style="font-size:11px;color:var(--gris)">Prime mensuelle</div>
+                    <div style="font-weight:800;color:var(--or)">${formatMontant(f.prime_mensuelle)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;color:var(--gris)">Capital garanti</div>
+                    <div style="font-weight:800;color:var(--vert)">${formatMontant(f.capital_garanti)}</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--gris);margin-bottom:14px">Durée : ${f.duree_mois} mois</div>
+                ${!estAdmin
+                ? dejaFait
+                  ? `<div style="background:var(--vert2);color:var(--vert);border-radius:var(--radius);padding:10px;text-align:center;font-weight:700">✓ Déjà souscrit</div>`
+                  : `<button class="btn btn-success" style="width:100%" onclick="souscrire(${f.id},'${f.nom}')">Souscrire</button>`
+                : ''
+              }
+              </div>`;
+          }).join('')}
         </div>`;
-  } catch(e) {}
 
-  // Mes polices
-  try {
-    const r = await API('/assurance/mes-souscriptions/');
-    const d = await r.json();
-    const polices = d.results || d;
-    document.getElementById('t-mes-polices').innerHTML = polices.length === 0
-      ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune souscription active.</p></div>'
-      : `<div class="table-wrap"><table>
-          <thead><tr><th>#</th><th>Formule</th><th>Statut</th><th>Souscrit le</th><th>Expire le</th><th>Jours restants</th></tr></thead>
-          <tbody>
-            ${polices.map(p => `
-              <tr>
-                <td>${p.id}</td>
-                <td><strong>${p.formule_nom || '—'}</strong></td>
-                <td>${badgeStatut(p.statut)}</td>
-                <td>${formatDate(p.date_souscription)}</td>
-                <td>${formatDate(p.date_expiration)}</td>
-                <td><strong style="color:${p.jours_avant_expiration < 15 ? 'var(--rouge)' : 'var(--vert)'}">${p.jours_avant_expiration}j</strong></td>
-              </tr>`).join('')}
-          </tbody>
-        </table></div>`;
-  } catch(e) {}
-}
+        // Mes polices
+        afficherMesPolices(polices);
 
-function switchTabGlobal(e, targetId) {
-  const container = document.getElementById('page-content');
-  container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  container.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  e.target.classList.add('active');
-  document.getElementById(targetId).classList.add('active');
-}
+      } catch (e) { console.error(e); }
+    }
 
-async function souscrire(formuleId, formuleNom) {
-  if (!confirm(`Confirmer la souscription à "${formuleNom}" ?`)) return;
-  try {
-    const r = await API('/assurance/souscriptions/', {
-      method: 'POST', body: JSON.stringify({ formule: formuleId })
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
-    toast('Souscription confirmée !', 'success');
-    pageAssurance();
-  } catch(e) { toast(e.message, 'error'); }
-}
+    function afficherMesPolices(polices) {
+      document.getElementById('t-mes-polices').innerHTML = polices.length === 0
+        ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune souscription active.</p></div>'
+        : `<div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Formule</th><th>Statut</th><th>Souscrit le</th><th>Expire le</th><th>Jours restants</th></tr></thead>
+        <tbody>
+          ${polices.map(p => `
+            <tr>
+              <td>${p.id}</td>
+              <td><strong>${p.formule_nom || '—'}</strong></td>
+              <td>${badgeStatut(p.statut)}</td>
+              <td>${formatDate(p.date_souscription)}</td>
+              <td>${formatDate(p.date_expiration)}</td>
+              <td><strong style="color:${p.jours_avant_expiration < 15 ? 'var(--rouge)' : 'var(--vert)'}">${p.jours_avant_expiration}j</strong></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : NOTIFICATIONS
-// ═══════════════════════════════════════════════════════════
-async function pageNotifications() {
-  document.getElementById('page-title').textContent = 'Notifications';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    async function souscrire(formuleId, formuleNom) {
+      if (!confirm(`Confirmer la souscription à "${formuleNom}" ?`)) return;
+      try {
+        const r = await API('/assurance/souscriptions/', {
+          method: 'POST', body: JSON.stringify({ formule: formuleId })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
+        toast('Souscription confirmée !', 'success');
+        pageAssurance(); // Recharger toute la page assurance
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : NOTIFICATIONS
+    // ═══════════════════════════════════════════════════════════
+    async function pageNotifications() {
+      document.getElementById('page-title').textContent = 'Notifications';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div class="section-title">
       Mes notifications
       <button class="btn btn-outline btn-sm" onclick="toutMarquerLu()">✓ Tout marquer comme lu</button>
@@ -871,70 +1439,99 @@ async function pageNotifications() {
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
     </div>
   `;
-  await chargerNotifications();
-}
+      await chargerNotifications();
+    }
 
-async function chargerNotifications() {
-  try {
-    const r = await API('/notifications/');
-    const d = await r.json();
-    const notifs = d.results || d;
-    const icons = {
-      CREDIT_STATUT: '💳', REMBOURSEMENT: '💰',
-      ASSURANCE: '🛡️', ALERTE_ECHEANCE: '⚠️', ALERTE_ASSURANCE: '⏰',
-    };
-    document.getElementById('liste-notifs').innerHTML = notifs.length === 0
-      ? '<div class="empty-state"><div class="icon">🔔</div><p>Aucune notification.</p></div>'
-      : notifs.map(n => `
-          <div class="notif-item ${!n.est_lu ? 'unread' : ''}" onclick="marquerLu(${n.id}, this)">
+    async function chargerNotifications() {
+      try {
+        const r = await API('/notifications/');
+        const d = await r.json();
+        const notifs = d.results || d;
+        const icons = {
+          CREDIT_STATUT: '💳', REMBOURSEMENT: '💰',
+          ASSURANCE: '🛡️', ALERTE_ECHEANCE: '⚠️', ALERTE_ASSURANCE: '⏰',
+        };
+        document.getElementById('liste-notifs').innerHTML = notifs.length === 0
+          ? '<div class="empty-state"><div class="icon">🔔</div><p>Aucune notification.</p></div>'
+          : notifs.map(n => `
+          <div class="notif-item ${!n.est_lu ? 'unread' : ''}"
+               onclick="voirNotif(${n.id},'${n.titre.replace(/'/g, "\\'")}',\`${n.message.replace(/`/g, '\\`')}\`,'${n.created_at}',this)">
             <div class="notif-icon">${icons[n.type_notification] || '🔔'}</div>
             <div class="notif-body" style="flex:1">
               <div class="notif-title">${n.titre}</div>
-              <div class="notif-msg">${n.message}</div>
+              <div class="notif-msg">${n.message.substring(0, 80)}${n.message.length > 80 ? '…' : ''}</div>
               <div class="notif-time">${formatDate(n.created_at)}</div>
             </div>
             ${!n.est_lu ? '<div class="unread-dot"></div>' : ''}
           </div>`).join('');
-  } catch(e) {}
-}
+      } catch (e) { }
+    }
 
-async function marquerLu(id, el) {
-  await API(`/notifications/${id}/lire/`, { method: 'PATCH' });
-  el.classList.remove('unread');
-  el.querySelector('.unread-dot')?.remove();
-  chargerNotifCount();
-}
+    async function voirNotif(id, titre, message, date, el) {
+      // Marquer comme lu
+      await API(`/notifications/${id}/lire/`, { method: 'PATCH' });
+      el.classList.remove('unread');
+      el.querySelector('.unread-dot')?.remove();
+      chargerNotifCount();
 
-async function toutMarquerLu() {
-  await API('/notifications/tout-lire/', { method: 'PATCH' });
-  toast('Toutes les notifications sont lues.', 'success');
-  await chargerNotifications();
-  chargerNotifCount();
-}
+      // Afficher modal de détail
+      let modal = document.getElementById('modal-notif');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-notif';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+      <div class="modal" style="max-height:70vh">
+        <div class="modal-title">
+          <span id="mn-titre"></span>
+          <span class="modal-close" onclick="document.getElementById('modal-notif').classList.remove('open')">×</span>
+        </div>
+        <div style="font-size:12px;color:var(--gris);margin-bottom:16px" id="mn-date"></div>
+        <div style="font-size:14px;line-height:1.7;color:#2C3E50;overflow-y:auto;max-height:400px;padding-right:8px" id="mn-message"></div>
+      </div>`;
+        document.body.appendChild(modal);
+      }
+      document.getElementById('mn-titre').textContent = titre;
+      document.getElementById('mn-date').textContent = formatDate(date);
+      document.getElementById('mn-message').textContent = message;
+      modal.classList.add('open');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : CHAT
-// ═══════════════════════════════════════════════════════════
-let chatSocket = null;
-let chatConvId = null;
+    async function marquerLu(id, el) {
+      await API(`/notifications/${id}/lire/`, { method: 'PATCH' });
+      el.classList.remove('unread');
+      el.querySelector('.unread-dot')?.remove();
+      chargerNotifCount();
+    }
 
-async function pageChat() {
-  document.getElementById('page-title').textContent = 'Support Chat';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    async function toutMarquerLu() {
+      await API('/notifications/tout-lire/', { method: 'PATCH' });
+      toast('Toutes les notifications sont lues.', 'success');
+      document.getElementById('notif-count').style.display = 'none'; // ← mise à jour badge
+      await chargerNotifications();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : CHAT
+    // ═══════════════════════════════════════════════════════════
+    let chatSocket = null;
+    let chatConvId = null;
+
+    async function pageChat() {
+      document.getElementById('page-title').textContent = 'Support Chat';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;height:calc(100vh - 140px)">
-      <!-- Liste conversations -->
       <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
         <div style="padding:14px 16px;border-bottom:1px solid #EEF1F3;display:flex;align-items:center;justify-content:space-between">
           <strong style="font-size:14px;color:var(--bleu)">Conversations</strong>
-          ${!estAdmin ? `<button class="btn btn-primary btn-sm" onclick="nouvelleConversation()">+</button>` : ''}
+          <div style="display:flex;gap:6px;align-items:center">
+            <button onclick="chargerConversations()" class="btn btn-outline btn-sm" title="Rafraîchir">🔄</button>
+            ${!estAdmin ? `<button class="btn btn-primary btn-sm" onclick="nouvelleConversation()">+</button>` : ''}
+          </div>
         </div>
-        <div id="liste-convs" style="overflow-y:auto;flex:1">
-          <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
-        </div>
+        <div id="liste-convs" style="overflow-y:auto;flex:1"></div>
       </div>
-
-      <!-- Zone messages -->
       <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column" id="chat-right">
         <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--gris)">
           <div style="text-align:center">
@@ -945,17 +1542,21 @@ async function pageChat() {
       </div>
     </div>
   `;
-  await chargerConversations();
-}
 
-async function chargerConversations() {
-  try {
-    const r = await API('/chat/conversations/');
-    const d = await r.json();
-    const convs = d.results || d;
-    document.getElementById('liste-convs').innerHTML = convs.length === 0
-      ? '<div class="empty-state"><p>Aucune conversation.</p></div>'
-      : convs.map(cv => `
+      await chargerConversations();
+
+      // Rafraîchir la liste toutes les 10 secondes
+      window._chatRefreshInterval = setInterval(chargerConversations, 10000);
+    }
+
+    async function chargerConversations() {
+      try {
+        const r = await API('/chat/conversations/');
+        const d = await r.json();
+        const convs = d.results || d;
+        document.getElementById('liste-convs').innerHTML = convs.length === 0
+          ? '<div class="empty-state"><p>Aucune conversation.</p></div>'
+          : convs.map(cv => `
           <div onclick="ouvrirConversation(${cv.id},'${cv.sujet}')"
                style="padding:12px 16px;border-bottom:1px solid #EEF1F3;cursor:pointer;transition:background .15s"
                onmouseover="this.style.background='#F8F9FA'" onmouseout="this.style.background=''">
@@ -965,18 +1566,25 @@ async function chargerConversations() {
             </div>
             <div style="margin-top:4px">${badgeStatut(cv.statut)}</div>
           </div>`).join('');
-  } catch(e) {}
-}
+      } catch (e) { }
+    }
 
-async function ouvrirConversation(id, sujet) {
-  chatConvId = id;
-  const right = document.getElementById('chat-right');
-  right.innerHTML = `
+    async function ouvrirConversation(id, sujet) {
+      // Fermer le WebSocket précédent proprement
+      if (chatSocket) {
+        chatSocket.close();
+        chatSocket = null;
+      }
+      chatConvId = id;
+
+      const right = document.getElementById('chat-right');
+      right.innerHTML = `
     <div style="padding:12px 16px;border-bottom:1px solid #EEF1F3;font-weight:700;color:var(--bleu);display:flex;align-items:center;justify-content:space-between">
       <span>💬 ${sujet}</span>
       <span style="font-size:11px;color:var(--gris)" id="ws-status">⚪ Connexion…</span>
     </div>
     <div id="messages-zone" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+    <div id="frappe-zone" style="padding:0 16px 4px;font-size:12px;color:var(--gris);font-style:italic;min-height:18px"></div>
     <div style="padding:12px 16px;border-top:1px solid #EEF1F3;display:flex;gap:8px">
       <input id="msg-input" type="text" placeholder="Écrivez votre message…"
              style="flex:1;border:1.5px solid #D5D8DC;border-radius:24px;padding:10px 16px;font-size:13px;outline:none"
@@ -985,71 +1593,85 @@ async function ouvrirConversation(id, sujet) {
     </div>
   `;
 
-  // Charger historique
-  try {
-    const r = await API(`/chat/conversations/${id}/messages/`);
-    const d = await r.json();
-    (d.results || d).forEach(afficherMsg);
-  } catch(e) {}
+      // Charger historique dans la zone vide
+      try {
+        const r = await API(`/chat/conversations/${id}/messages/`);
+        const d = await r.json();
+        (d.results || d).forEach(afficherMsg);
+      } catch (e) { }
 
-  // WebSocket
-  if (chatSocket) chatSocket.close();
-  const token = localStorage.getItem('token');
-  chatSocket = new WebSocket(`ws://${location.host}/ws/chat/${id}/?token=${token}`);
-  chatSocket.onopen  = () => { document.getElementById('ws-status').textContent = '🟢 En ligne'; };
-  chatSocket.onclose = () => { document.getElementById('ws-status').textContent = '🔴 Déconnecté'; };
-  chatSocket.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    if (data.type === 'message') afficherMsg(data.message);
-  };
-}
+      // Nouveau WebSocket
+      const token = localStorage.getItem('token');
+      chatSocket = new WebSocket(`ws://${location.host}/ws/chat/${id}/?token=${token}`);
 
-function afficherMsg(msg) {
-  const zone    = document.getElementById('messages-zone');
-  if (!zone) return;
-  const moi     = parseInt(msg.auteur_id ?? msg.auteur) === parseInt(profil.id);
-  const heure   = new Date(msg.created_at).toLocaleTimeString('fr-CI',{hour:'2-digit',minute:'2-digit'});
-  const div     = document.createElement('div');
-  div.style.cssText = `display:flex;flex-direction:column;align-items:${moi?'flex-end':'flex-start'}`;
-  div.innerHTML = `
-    ${!moi ? `<div style="font-size:11px;font-weight:700;color:var(--bleu);margin-bottom:3px">${msg.auteur_nom||'Agent'}</div>` : ''}
-    <div style="max-width:72%;padding:10px 14px;border-radius:${moi?'12px 12px 4px 12px':'12px 12px 12px 4px'};background:${moi?'var(--bleu)':'var(--bg)'};color:${moi?'#fff':'#2C3E50'};font-size:13px;line-height:1.4">${msg.contenu}</div>
+      chatSocket.onopen = () => {
+        document.getElementById('ws-status').textContent = '🟢 En ligne';
+      };
+      chatSocket.onclose = () => {
+        const el = document.getElementById('ws-status');
+        if (el) el.textContent = '🔴 Déconnecté';
+      };
+      chatSocket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === 'message') {
+          afficherMsg(data.message);
+        } else if (data.type === 'frappe') {
+          const fz = document.getElementById('frappe-zone');
+          if (fz && parseInt(data.auteur_id) !== parseInt(profil.id)) {
+            fz.textContent = `${data.auteur_nom} est en train d'écrire…`;
+            clearTimeout(window._frappTimer);
+            window._frappTimer = setTimeout(() => { if (fz) fz.textContent = ''; }, 3000);
+          }
+        }
+      };
+    }
+
+    function afficherMsg(msg) {
+      const zone = document.getElementById('messages-zone');
+      if (!zone) return;
+      const moi = parseInt(msg.auteur_id ?? msg.auteur) === parseInt(profil.id);
+      const heure = new Date(msg.created_at).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' });
+      const div = document.createElement('div');
+      div.style.cssText = `display:flex;flex-direction:column;align-items:${moi ? 'flex-end' : 'flex-start'}`;
+      div.innerHTML = `
+    ${!moi ? `<div style="font-size:11px;font-weight:700;color:var(--bleu);margin-bottom:3px">${msg.auteur_nom || 'Agent'}</div>` : ''}
+    <div style="max-width:72%;padding:10px 14px;border-radius:${moi ? '12px 12px 4px 12px' : '12px 12px 12px 4px'};background:${moi ? 'var(--bleu)' : 'var(--bg)'};color:${moi ? '#fff' : '#2C3E50'};font-size:13px;line-height:1.4">${msg.contenu}</div>
     <div style="font-size:10px;color:var(--gris);margin-top:3px">${heure}</div>
   `;
-  zone.appendChild(div);
-  zone.scrollTop = zone.scrollHeight;
-}
+      zone.appendChild(div);
+      zone.scrollTop = zone.scrollHeight;
+    }
 
-function envoyerMsg() {
-  const input = document.getElementById('msg-input');
-  const msg   = input.value.trim();
-  if (!msg || !chatSocket || chatSocket.readyState !== 1) return;
-  chatSocket.send(JSON.stringify({ type:'message', contenu:msg }));
-  input.value = '';
-}
+    function envoyerMsg() {
+      const input = document.getElementById('msg-input');
+      const msg = input.value.trim();
+      if (!msg || !chatSocket || chatSocket.readyState !== 1) return;
+      chatSocket.send(JSON.stringify({ type: 'message', contenu: msg }));
+      input.value = '';
+    }
 
-async function nouvelleConversation() {
-  const sujet = prompt('Sujet de la conversation :');
-  if (!sujet) return;
-  try {
-    const r = await API('/chat/conversations/', {
-      method: 'POST', body: JSON.stringify({ sujet })
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(JSON.stringify(d));
-    toast('Conversation créée !', 'success');
-    await chargerConversations();
-    ouvrirConversation(d.id, sujet);
-  } catch(e) { toast(e.message, 'error'); }
-}
+    async function nouvelleConversation() {
+      const sujet = prompt('Sujet de la conversation :');
+      if (!sujet) return;
+      try {
+        const r = await API('/chat/conversations/', {
+          method: 'POST', body: JSON.stringify({ sujet })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(JSON.stringify(d));
+        toast('Conversation créée !', 'success');
+        await chargerConversations();
+        ouvrirConversation(d.id, sujet);
+      } catch (e) { toast(e.message, 'error'); }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : DASHBOARD ADMIN
-// ═══════════════════════════════════════════════════════════
-async function pageDashboardAdmin() {
-  document.getElementById('page-title').textContent = 'Tableau de bord';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : DASHBOARD ADMIN
+    // ═══════════════════════════════════════════════════════════
+    async function pageDashboardAdmin() {
+      document.getElementById('page-title').textContent = 'Tableau de bord';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div class="stat-grid" id="admin-stats">
       <div class="stat-card"><div class="stat-label">Crédits soumis</div><div class="stat-value" id="a-soumis">…</div></div>
       <div class="stat-card or"><div class="stat-label">En analyse</div><div class="stat-value" id="a-analyse">…</div></div>
@@ -1074,69 +1696,77 @@ async function pageDashboardAdmin() {
     </div>
   `;
 
-  try {
-    const [rs, rca] = await Promise.all([
-      API('/dashboard/stats/'),
-      API('/dashboard/conversations-en-attente/'),
-    ]);
-    const stats = await rs.json();
-    const attente = await rca.json();
+      try {
+        const [rs, rca] = await Promise.all([
+          API('/dashboard/stats/'),
+          API('/dashboard/conversations-en-attente/'),
+        ]);
+        const stats = await rs.json();
+        const attente = await rca.json();
 
-    // Stats
-    const ps = stats.credits_par_statut || {};
-    document.getElementById('a-soumis').textContent   = ps.SOUMISE    || 0;
-    document.getElementById('a-analyse').textContent  = ps.EN_ANALYSE || 0;
-    document.getElementById('a-approuves').textContent= ps.APPROUVEE  || 0;
-    document.getElementById('a-taux').textContent     = (stats.taux_recouvrement_pct || 0) + '%';
+        // Stats
+        const ps = stats.credits_par_statut || {};
+        document.getElementById('a-soumis').textContent = ps.SOUMISE || 0;
+        document.getElementById('a-analyse').textContent = ps.EN_ANALYSE || 0;
+        document.getElementById('a-approuves').textContent = ps.APPROUVEE || 0;
+        document.getElementById('a-taux').textContent = (stats.taux_recouvrement_pct || 0) + '%';
 
-    // Graphique statuts
-    new Chart(document.getElementById('chart-statuts'), {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(ps),
-        datasets: [{ data: Object.values(ps), backgroundColor: ['#2471A3','#D4AC0D','#1E8449','#117A65','#C0392B'] }]
-      },
-      options: { plugins: { legend: { position:'bottom' } }, responsive: true }
-    });
+        // Graphique statuts
+        new Chart(document.getElementById('chart-statuts'), {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(ps),
+            datasets: [{ data: Object.values(ps), backgroundColor: ['#2471A3', '#D4AC0D', '#1E8449', '#117A65', '#C0392B'] }]
+          },
+          options: { plugins: { legend: { position: 'bottom' } }, responsive: true }
+        });
 
-    // Graphique assurances
-    new Chart(document.getElementById('chart-assurances'), {
-      type: 'bar',
-      data: {
-        labels: ['Actives'],
-        datasets: [{ label:'Souscriptions', data:[stats.souscriptions_actives||0], backgroundColor:'#1A5276' }]
-      },
-      options: { responsive: true, plugins: { legend: { display:false } } }
-    });
+        // Graphique assurances
+        // Remplacer le graphique assurances par un affichage plus lisible
+        new Chart(document.getElementById('chart-assurances'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Actives', 'Expirées', 'Résiliées'],
+            datasets: [{
+              data: [
+                stats.souscriptions_actives || 0,
+                stats.souscriptions_expirees || 0,
+                stats.souscriptions_resiliees || 0,
+              ],
+              backgroundColor: ['#1E8449', '#C0392B', '#AEB6BF'],
+            }]
+          },
+          options: { plugins: { legend: { position: 'bottom' } }, responsive: true }
+        });
 
-    // Conversations en attente
-    const convs = attente.conversations || [];
-    document.getElementById('convs-attente').innerHTML = convs.length === 0
-      ? '<div class="empty-state"><div class="icon">✅</div><p>Aucune conversation en attente.</p></div>'
-      : `<div class="table-wrap"><table>
+        // Conversations en attente
+        const convs = attente.conversations || [];
+        document.getElementById('convs-attente').innerHTML = convs.length === 0
+          ? '<div class="empty-state"><div class="icon">✅</div><p>Aucune conversation en attente.</p></div>'
+          : `<div class="table-wrap"><table>
           <thead><tr><th>#</th><th>Client</th><th>Région</th><th>Sujet</th><th>Attente</th><th></th></tr></thead>
           <tbody>
             ${convs.map(cv => `
               <tr>
                 <td>${cv.id}</td>
                 <td>${cv.client_nom}</td>
-                <td>${cv.client_region||'—'}</td>
+                <td>${cv.client_region || '—'}</td>
                 <td>${cv.sujet}</td>
-                <td style="color:${cv.attente_minutes>60?'var(--rouge)':'var(--vert)'}"><strong>${cv.attente_minutes} min</strong></td>
+                <td style="color:${cv.attente_minutes > 60 ? 'var(--rouge)' : 'var(--vert)'}"><strong>${cv.attente_minutes} min</strong></td>
                 <td><button class="btn btn-primary btn-sm" onclick="pageChat()">Ouvrir</button></td>
               </tr>`).join('')}
           </tbody>
         </table></div>`;
-  } catch(e) { console.error(e); }
-}
+      } catch (e) { console.error(e); }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PAGE : REMBOURSEMENTS (AGENT/ADMIN)
-// ═══════════════════════════════════════════════════════════
-async function pageRemboursements() {
-  document.getElementById('page-title').textContent = 'Remboursements';
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PAGE : REMBOURSEMENTS (AGENT/ADMIN)
+    // ═══════════════════════════════════════════════════════════
+    async function pageRemboursements() {
+      document.getElementById('page-title').textContent = 'Remboursements';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
     <div class="tabs">
       <div class="tab active" onclick="switchTabGlobal(event,'t-alertes')">⚠️ Alertes</div>
       <div class="tab" onclick="switchTabGlobal(event,'t-historique-paie')">📋 Historique</div>
@@ -1149,24 +1779,24 @@ async function pageRemboursements() {
     </div>
   `;
 
-  // Alertes
-  try {
-    const r = await API('/remboursements/alertes/');
-    const d = await r.json();
-    const aVenir  = d.echeances_a_venir_j3  || [];
-    const retard  = d.echeances_en_retard_j1 || [];
-    document.getElementById('t-alertes').innerHTML = `
+      // Alertes
+      try {
+        const r = await API('/remboursements/alertes/');
+        const d = await r.json();
+        const aVenir = d.echeances_a_venir_j3 || [];
+        const retard = d.echeances_en_retard_j1 || [];
+        document.getElementById('t-alertes').innerHTML = `
       <div class="section-title" style="margin-bottom:14px">
         <span>📅 Échéances dans 3 jours (${aVenir.length})</span>
       </div>
       ${aVenir.length === 0
-        ? '<div class="empty-state"><p>Aucune échéance dans 3 jours.</p></div>'
-        : `<div class="table-wrap"><table>
+            ? '<div class="empty-state"><p>Aucune échéance dans 3 jours.</p></div>'
+            : `<div class="table-wrap"><table>
             <thead><tr><th>Client</th><th>Tél</th><th>Région</th><th>Montant</th><th>Date</th></tr></thead>
-            <tbody>${aVenir.map(e=>`
+            <tbody>${aVenir.map(e => `
               <tr>
-                <td>${e.client_nom}</td><td>${e.client_tel||'—'}</td>
-                <td>${e.client_region||'—'}</td>
+                <td>${e.client_nom}</td><td>${e.client_tel || '—'}</td>
+                <td>${e.client_region || '—'}</td>
                 <td>${formatMontant(e.montant_total)}</td>
                 <td>${formatDate(e.date_echeance)}</td>
               </tr>`).join('')}
@@ -1175,48 +1805,128 @@ async function pageRemboursements() {
         <span style="color:var(--rouge)">🔴 Échéances en retard (${retard.length})</span>
       </div>
       ${retard.length === 0
-        ? '<div class="empty-state"><p>Aucun retard.</p></div>'
-        : `<div class="table-wrap"><table>
+            ? '<div class="empty-state"><p>Aucun retard.</p></div>'
+            : `<div class="table-wrap"><table>
             <thead><tr><th>Client</th><th>Tél</th><th>Région</th><th>Montant</th><th>Date</th></tr></thead>
-            <tbody>${retard.map(e=>`
+            <tbody>${retard.map(e => `
               <tr style="background:#FEF9E7">
-                <td>${e.client_nom}</td><td>${e.client_tel||'—'}</td>
-                <td>${e.client_region||'—'}</td>
+                <td>${e.client_nom}</td><td>${e.client_tel || '—'}</td>
+                <td>${e.client_region || '—'}</td>
                 <td style="color:var(--rouge);font-weight:700">${formatMontant(e.montant_total)}</td>
                 <td style="color:var(--rouge)">${formatDate(e.date_echeance)}</td>
               </tr>`).join('')}
             </tbody></table></div>`}
     `;
-  } catch(e) {}
+      } catch (e) { }
 
-  // Historique
-  try {
-    const r = await API('/remboursements/historique/');
-    const d = await r.json();
-    const paies = d.results || d;
-    document.getElementById('t-historique-paie').innerHTML = paies.length === 0
-      ? '<div class="empty-state"><div class="icon">💰</div><p>Aucun paiement enregistré.</p></div>'
-      : `<div class="table-wrap"><table>
+      // Historique
+      try {
+        const r = await API('/remboursements/historique/');
+        const d = await r.json();
+        const paies = d.results || d;
+        document.getElementById('t-historique-paie').innerHTML = paies.length === 0
+          ? '<div class="empty-state"><div class="icon">💰</div><p>Aucun paiement enregistré.</p></div>'
+          : `<div class="table-wrap"><table>
           <thead><tr><th>#</th><th>Client</th><th>Montant payé</th><th>Pénalité</th><th>Moyen</th><th>Date</th></tr></thead>
-          <tbody>${paies.map(p=>`
+          <tbody>${paies.map(p => `
             <tr>
               <td>${p.id}</td>
-              <td>${p.client_nom||'—'}</td>
+              <td>${p.client_nom || '—'}</td>
               <td><strong>${formatMontant(p.montant_paye)}</strong></td>
-              <td style="color:${p.penalite_retard>0?'var(--rouge)':'var(--gris)'}">
+              <td style="color:${p.penalite_retard > 0 ? 'var(--rouge)' : 'var(--gris)'}">
                 ${p.penalite_retard > 0 ? formatMontant(p.penalite_retard) : '—'}
               </td>
               <td>${p.moyen_paiement}</td>
               <td>${formatDate(p.date_paiement)}</td>
             </tr>`).join('')}
           </tbody></table></div>`;
-  } catch(e) {}
-}
+      } catch (e) { }
+    }
+    async function creerFormule() {
+      const btn = document.getElementById('btn-creer-formule');
+      const payload = {
+        nom: document.getElementById('fa-nom').value.trim(),
+        categorie: document.getElementById('fa-categorie').value,
+        description: document.getElementById('fa-description').value.trim(),
+        prime_mensuelle: document.getElementById('fa-prime').value,
+        capital_garanti: document.getElementById('fa-capital').value,
+        duree_mois: document.getElementById('fa-duree').value,
+        est_active: true,
+      };
 
-// ═══════════════════════════════════════════════════════════
-// DÉMARRAGE
-// ═══════════════════════════════════════════════════════════
-afficherPage('dashboard');
-</script>
+      if (!payload.nom || !payload.description || !payload.prime_mensuelle ||
+        !payload.capital_garanti || !payload.duree_mois) {
+        toast('Veuillez remplir tous les champs.', 'error'); return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Création…';
+
+      try {
+        const r = await API('/assurance/formules/creer/', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
+        toast('Formule créée avec succès !', 'success');
+        fermerModal('modal-new-formule');
+        pageAssurance();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Créer la formule';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // DÉMARRAGE
+    // ═══════════════════════════════════════════════════════════
+    afficherPage('dashboard');
+  </script>
+
+  <!-- MODALE NOUVELLE FORMULE ASSURANCE -->
+  <div class="modal-overlay" id="modal-new-formule">
+    <div class="modal">
+      <div class="modal-title">
+        Nouvelle formule d'assurance
+        <span class="modal-close" onclick="fermerModal('modal-new-formule')">×</span>
+      </div>
+      <div class="field">
+        <label>Nom de la formule *</label>
+        <input type="text" id="fa-nom" placeholder="ex: Assurance Santé Premium" />
+      </div>
+      <div class="field">
+        <label>Catégorie *</label>
+        <select id="fa-categorie">
+          <option value="VIE">Assurance Vie</option>
+          <option value="DECES_INVALIDITE">Décès-Invalidité</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Description *</label>
+        <textarea id="fa-description" placeholder="Décrivez la formule…"></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Prime mensuelle (FCFA) *</label>
+          <input type="number" id="fa-prime" placeholder="5000" />
+        </div>
+        <div class="field">
+          <label>Capital garanti (FCFA) *</label>
+          <input type="number" id="fa-capital" placeholder="2000000" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Durée (mois) *</label>
+        <input type="number" id="fa-duree" placeholder="12" />
+      </div>
+      <button class="btn btn-primary" onclick="creerFormule()" id="btn-creer-formule">
+        Créer la formule
+      </button>
+    </div>
+  </div>
 </body>
+
 </html>

@@ -42,7 +42,8 @@ class Souscription(models.Model):
 
     statut = models.CharField(
         max_length=10,
-        choices=STATUT_CHOICES
+        choices=STATUT_CHOICES,
+        default="ACTIVE"
     )
 
     date_souscription = models.DateField(auto_now_add=True)

@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from .models import Paiement
 from apps.credits.models import EcheancierRemboursement
+from apps.remboursements.models import Paiement
 
 
 class PaiementSerializer(serializers.ModelSerializer):

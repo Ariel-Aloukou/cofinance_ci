@@ -159,3 +159,8 @@ class VerifierExpirationsView(APIView):
         return Response({
             "message": "Vérification des expirations effectuée avec succès."
         })
+        
+@extend_schema(tags=["Assurance"], summary="Créer une formule (Admin)")
+class FormulaCreateView(generics.CreateAPIView):
+    serializer_class   = FormulaAssuranceSerializer
+    permission_classes = [EstAdmin]        

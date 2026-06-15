@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from drf_spectacular.utils import extend_schema
 
 # Modèles
+from apps.authentication.management.commands.seed_db import User
 from apps.credits.models import (
     DemandeCredit,
     HistoriqueStatutCredit,
@@ -17,7 +18,6 @@ from apps.credits.models import (
     EcheancierRemboursement,
 )
 
-# Serializers — à créer dans serializers.py (voir ci-dessous)
 from apps.credits.serializers import (
     DemandeCreditSerializer,
     ChangerStatutSerializer,
@@ -59,12 +59,46 @@ class DemandeCreditViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         demande = serializer.save(client=self.request.user)
+
+    # Calcul du score
+        from .services import calculer_score_eligibilite
         demande.score_eligibilite = calculer_score_eligibilite(
             self.request.user,
             demande.montant_demande,
             demande.duree_mois,
         )
         demande.save()
+
+        # Notification de confirmation au CLIENT
+        Notification.objects.create(
+            destinataire      = self.request.user,
+            type_notification = 'CREDIT_STATUT',
+            titre             = f'Demande de crédit #{demande.id} soumise',
+            message           = (
+                f'Votre demande de {demande.montant_demande} FCFA '
+                f'pour {demande.duree_mois} mois a été soumise. '
+                f'Score d\'éligibilité : {demande.score_eligibilite}/100.'
+            ),
+        )
+
+        # Notification à TOUS les agents et admins
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        agents = User.objects.filter(role__in=['AGENT', 'ADMIN'])
+        notifs = [
+            Notification(
+                destinataire      = agent,
+                type_notification = 'CREDIT_STATUT',
+                titre             = f'Nouvelle demande de crédit #{demande.id}',
+                message           = (
+                    f'{demande.client.get_full_name()} a soumis une demande '
+                    f'de {demande.montant_demande} FCFA. '
+                    f'Score : {demande.score_eligibilite}/100.'
+                ),
+            )
+            for agent in agents
+        ]
+        Notification.objects.bulk_create(notifs)
 
     # ── Action 1 : Changer le statut ──────────────────────────────
     @extend_schema(

@@ -107,6 +107,7 @@
 
 <script>
 async function seConnecter() {
+  localStorage.clear();
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   const errBox   = document.getElementById('error-box');
@@ -157,9 +158,21 @@ async function seConnecter() {
 // Si déjà connecté, rediriger
 const token = localStorage.getItem('token');
 if (token) {
-  const profil = JSON.parse(localStorage.getItem('profil') || '{}');
-  window.location.href = profil.role === 'ADMIN' || profil.role === 'AGENT'
-    ? '/dashboard-admin/' : '/dashboard/';
+  // Vérifier si le token est encore valide avant de rediriger
+  fetch('/api/auth/profil/', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }).then(r => {
+    if (r.ok) {
+      r.json().then(profil => {
+        window.location.href =
+          profil.role === 'ADMIN' || profil.role === 'AGENT'
+          ? '/dashboard-admin/' : '/dashboard/';
+      });
+    } else {
+      // Token expiré — nettoyer et rester sur login
+      localStorage.clear();
+    }
+  }).catch(() => localStorage.clear());
 }
 </script>
 </body>
