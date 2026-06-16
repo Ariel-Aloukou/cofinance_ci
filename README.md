@@ -1,7 +1,7 @@
 # COFINANCE CI — Plateforme API REST
  
 > Plateforme digitale de microcrédits, assurance mobile et support client.
-> Développée avec Python 3.11, Django 5.x et Django REST Framework.
+> Développée avec Python 3.11, Django 5.x et Django REST Framework. par Aloukou Ariel
  
 ## Technologies
 - Backend       : Python 3.11+, Django 5.x, Django REST Framework
@@ -56,6 +56,10 @@ python manage.py seed_db
 ```bash
 python manage.py runserver
 ```
+
+### . Lancer le serveur en asychrone
+```bash
+python -m daphne -p 8001 config.asgi:application```
  
 ## Comptes de démonstration
 | Rôle            | Username          | Password      |
@@ -67,10 +71,10 @@ python manage.py runserver
 ## Accès aux interfaces
 | Interface          | URL                               |
 |--------------------|-----------------------------------|
-| Swagger UI         | http://127.0.0.1:8000/api/docs/   |
-| Redoc              | http://127.0.0.1:8000/api/redoc/  |
-| Chat HTML          | http://127.0.0.1:8000/chat/       |
-| Admin Django       | http://127.0.0.1:8000/admin/      |
+| Swagger UI         | http://127.0.0.1:8001/api/docs/   |
+| Redoc              | http://127.0.0.1:8001/api/redoc/  |
+| Chat HTML          | http://127.0.0.1:8001/chat/       |
+| Admin Django       | http://127.0.0.1:8001/admin/      |
  
 ## Démo du chat en temps réel
 1. Ouvrir DEUX onglets sur http://127.0.0.1:8000/chat/
