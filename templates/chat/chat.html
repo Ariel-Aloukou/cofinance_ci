@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>COFINANCE CI — Support Client</title>
-  <link rel="stylesheet" href="/static/css/cofinance-theme.css">
+  <link rel="stylesheet" href="/static/css/premium-theme.css">
   <style>
     * {
       box-sizing: border-box;
@@ -14,27 +14,29 @@
 
     body {
       font-family: var(--font-body);
-      background: var(--bg-page);
+      background: var(--bg-app);
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 16px;
     }
 
     .chat-container {
-      width: 500px;
-      height: 650px;
+      width: min(500px, 100vw - 32px);
+      height: min(650px, 100vh - 32px);
       background: var(--bg-card);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 1px solid var(--border-light);
     }
 
     .chat-header {
-      background: linear-gradient(135deg, var(--brun-tres-fonce), var(--brun-fonce));
-      color: var(--text-on-dark);
+      background: linear-gradient(135deg, var(--accent-purple), #5a3dca);
+      color: #fff;
       padding: 16px 20px;
       display: flex;
       align-items: center;
@@ -55,7 +57,7 @@
     .status-dot {
       width: 10px;
       height: 10px;
-      background: var(--terracotta);
+      background: var(--accent-red);
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -80,14 +82,14 @@
 
     .message.moi {
       align-self: flex-end;
-      background: linear-gradient(135deg, var(--brun-doux), var(--brun));
-      color: var(--text-on-dark);
+      background: linear-gradient(135deg, var(--accent-green), #00b37a);
+      color: #fff;
       border-bottom-right-radius: 4px;
     }
 
     .message.autre {
       align-self: flex-start;
-      background: var(--beige);
+      background: var(--bg-hover);
       color: var(--text-primary);
       border-bottom-left-radius: 4px;
     }
@@ -100,7 +102,7 @@
     }
 
     .message.moi .auteur { color: rgba(255,255,255,0.75); }
-    .message.autre .auteur { color: var(--text-tertiary); }
+    .message.autre .auteur { color: var(--text-secondary); }
 
     .message .heure {
       font-size: 10px;
@@ -111,7 +113,7 @@
 
     .frappe-indicator {
       font-size: 12px;
-      color: var(--text-tertiary);
+      color: var(--text-secondary);
       font-style: italic;
       padding: 0 16px 8px;
       min-height: 20px;
@@ -134,16 +136,17 @@
       outline: none;
       transition: border-color 0.2s;
       background: var(--bg-input);
+      color: var(--text-primary);
     }
 
     .input-zone input:focus {
-      border-color: var(--brun-doux);
-      box-shadow: 0 0 0 3px rgba(139,115,85,0.15);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px var(--accent-green-dim);
     }
 
     .input-zone button {
-      background: var(--brun-doux);
-      color: var(--text-on-dark);
+      background: var(--accent-green);
+      color: #fff;
       border: none;
       border-radius: 50%;
       width: 42px;
@@ -151,10 +154,13 @@
       cursor: pointer;
       font-size: 18px;
       transition: background 0.2s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .input-zone button:hover {
-      background: var(--brun);
+      background: #00b37a;
       transform: scale(1.05);
     }
 
@@ -167,7 +173,7 @@
 
     .login-zone h3 {
       font-family: var(--font-display);
-      color: var(--brun-fonce);
+      color: var(--text-primary);
       margin-bottom: 8px;
     }
 
@@ -178,17 +184,18 @@
       font-size: 14px;
       outline: none;
       background: var(--bg-input);
+      color: var(--text-primary);
       transition: border-color 0.2s;
     }
 
     .login-zone input:focus {
-      border-color: var(--brun-doux);
-      box-shadow: 0 0 0 3px rgba(139,115,85,0.15);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px var(--accent-green-dim);
     }
 
     .login-zone button {
-      background: var(--brun-doux);
-      color: var(--text-on-dark);
+      background: var(--accent-green);
+      color: #fff;
       border: none;
       border-radius: var(--radius-md);
       padding: 12px;
@@ -198,12 +205,17 @@
     }
 
     .login-zone button:hover {
-      background: var(--brun);
+      background: #00b37a;
     }
 
     .error {
-      color: var(--terracotta-fonce);
+      color: var(--accent-red);
       font-size: 13px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -235,7 +247,7 @@
       <div class="input-zone">
         <form id="send-form" style="display:flex;flex:1;gap:8px">
           <input type="text" id="message-input" placeholder="Écrivez votre message..." oninput="signalerFrappe()" />
-          <button type="submit"></button>
+          <button type="submit">➤</button>
         </form>
       </div>
     </div>

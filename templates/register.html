@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COFINANCE CI — Inscription</title>
-<link rel="stylesheet" href="/static/css/cofinance-theme.css">
+<link rel="stylesheet" href="/static/css/premium-theme.css">
 <style>
-  :root { --bleu:var(--brun-doux); --bleu2:var(--brun); --or:var(--or-cuivre); --rouge:var(--terracotta); --vert:var(--vert-olive); --radius:var(--radius-md); }
+  :root { --bleu:var(--accent-purple); --bleu2:var(--accent-purple-hover); --or:var(--accent-gold); --rouge:var(--accent-red); --vert:var(--accent-green); --radius:var(--radius-md); --brun-doux:var(--accent-purple); --brun:var(--accent-purple-hover); --brun-tres-fonce:var(--bg-app); --brun-fonce:#1a1f2e; --or-cuivre:var(--accent-gold); --terracotta:var(--accent-red); --vert-olive:var(--accent-green); --bg-card:var(--bg-card); --border-light:var(--border-subtle); --bg-input:var(--bg-elevated); --text-primary:var(--text-primary); --text-secondary:var(--text-secondary); --text-tertiary:var(--text-tertiary); --text-muted:var(--text-tertiary); --text-on-dark:#fff; --font-display:var(--font-display); --radius-xl:var(--radius-xl); --shadow-lg:var(--shadow-lg); --terracotta-fonce:var(--accent-red); --vert-olive-fonce:var(--accent-green); --blanc-casse:var(--bg-card); --bg-page:var(--bg-app); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Segoe UI', sans-serif;
@@ -29,15 +29,15 @@
     padding: 10px 13px; font-size: 13px; outline: none; transition: border-color .2s;
     background: var(--bg-input);
   }
-  .field input:focus, .field select:focus { border-color: var(--brun-doux); box-shadow: 0 0 0 3px rgba(139,115,85,0.15); }
+  .field input:focus, .field select:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px var(--accent-purple-dim); }
   .btn { width: 100%; padding: 13px; background: var(--bleu); color: var(--text-on-dark); border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; transition: background .2s; margin-top: 6px; }
-  .btn:hover { background: var(--bleu2); box-shadow: 0 4px 16px rgba(107,91,74,0.3); }
+  .btn:hover { background: var(--bleu2); box-shadow: 0 4px 16px rgba(124,92,252,0.3); }
   .btn:disabled { background: var(--text-muted); cursor: not-allowed; }
   .error-box { background: rgba(193,122,110,0.1); color: var(--terracotta-fonce); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; border: 1px solid rgba(193,122,110,0.2); }
   .success-box { background: rgba(156,175,136,0.1); color: var(--vert-olive-fonce); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; border: 1px solid rgba(156,175,136,0.2); }
   .link-row { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-tertiary); }
   .link-row a { color: var(--bleu2); text-decoration: none; font-weight: 600; position: relative; }
-  .link-row a::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1.5px; background: var(--brun-doux); transition: width .3s; }
+  .link-row a::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1.5px; background: var(--accent-purple); transition: width .3s; }
   .link-row a:hover::after { width: 100%; }
   .link-row a:hover { text-decoration: none; }
   .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }

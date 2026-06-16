@@ -77,7 +77,7 @@ python -m daphne -p 8001 config.asgi:application```
 | Admin Django       | http://127.0.0.1:8001/admin/      |
  
 ## Démo du chat en temps réel
-1. Ouvrir DEUX onglets sur http://127.0.0.1:8000/chat/
+1. Ouvrir DEUX onglets sur http://127.0.0.1:8001/chat/
 2. Onglet 1 : Se connecter avec aya_kone (Client)
 3. Onglet 2 : Se connecter avec agent_kouassi (Agent)
 4. Utiliser l'ID de conversation 1 dans les deux onglets
