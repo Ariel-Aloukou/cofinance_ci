@@ -4,53 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COFINANCE CI — Connexion</title>
+<link rel="stylesheet" href="/static/css/cofinance-theme.css">
 <style>
   :root {
-    --bleu:    #1A5276;
-    --bleu2:   #2471A3;
-    --or:      #D4AC0D;
-    --bg:      #F0F4F8;
-    --blanc:   #FFFFFF;
-    --gris:    #6C7A89;
-    --rouge:   #C0392B;
-    --vert:    #1E8449;
-    --radius:  10px;
-    --shadow:  0 4px 24px rgba(26,82,118,0.13);
+    --bleu:    var(--brun-doux);
+    --bleu2:   var(--brun);
+    --or:      var(--or-cuivre);
+    --bg:      var(--bg-page);
+    --blanc:   var(--blanc-casse);
+    --gris:    var(--text-tertiary);
+    --rouge:   var(--terracotta);
+    --vert:    var(--vert-olive);
+    --radius:  var(--radius-md);
+    --shadow:  var(--shadow-md);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1A5276 0%, #2471A3 60%, #D4AC0D 100%);
+    background: linear-gradient(135deg, var(--brun-tres-fonce) 0%, var(--brun-fonce) 60%, var(--or-cuivre) 100%);
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
   }
   .card {
     background: var(--blanc);
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow);
     width: 100%; max-width: 420px;
     overflow: hidden;
   }
   .card-header {
-    background: var(--bleu);
+    background: linear-gradient(135deg, var(--brun-tres-fonce), var(--brun-fonce));
     padding: 32px 32px 24px;
     text-align: center;
   }
-  .logo { font-size: 28px; font-weight: 800; color: var(--blanc); letter-spacing: 1px; }
+  .logo { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--text-on-dark); letter-spacing: 1px; }
   .logo span { color: var(--or); }
   .subtitle { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
   .card-body { padding: 32px; }
-  .card-body h2 { font-size: 20px; color: var(--bleu); margin-bottom: 24px; font-weight: 700; }
+  .card-body h2 { font-family: var(--font-display); font-size: 20px; color: var(--text-primary); margin-bottom: 24px; font-weight: 700; }
   .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--bleu); margin-bottom: 6px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
   .field input {
-    width: 100%; border: 1.5px solid #D5D8DC;
+    width: 100%; border: 1.5px solid var(--border-light);
     border-radius: var(--radius); padding: 11px 14px;
     font-size: 14px; outline: none;
     transition: border-color .2s;
+    background: var(--bg-input);
   }
-  .field input:focus { border-color: var(--bleu2); }
+  .field input:focus { border-color: var(--brun-doux); box-shadow: 0 0 0 3px rgba(139,115,85,0.15); }
   .btn {
     width: 100%; padding: 13px;
     background: var(--bleu); color: var(--blanc);
@@ -59,16 +61,19 @@
     cursor: pointer; transition: background .2s;
     margin-top: 8px;
   }
-  .btn:hover { background: var(--bleu2); }
-  .btn:disabled { background: #AEB6BF; cursor: not-allowed; }
+  .btn:hover { background: var(--bleu2); box-shadow: 0 4px 16px rgba(107,91,74,0.3); }
+  .btn:disabled { background: var(--text-muted); cursor: not-allowed; }
   .error-box {
-    background: #FADBD8; color: var(--rouge);
+    background: rgba(193,122,110,0.1); color: var(--terracotta-fonce);
     border-radius: var(--radius); padding: 10px 14px;
     font-size: 13px; margin-bottom: 16px; display: none;
+    border: 1px solid rgba(193,122,110,0.2);
   }
-  .link-row { text-align: center; margin-top: 20px; font-size: 13px; color: var(--gris); }
-  .link-row a { color: var(--bleu2); text-decoration: none; font-weight: 600; }
-  .link-row a:hover { text-decoration: underline; }
+  .link-row { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-tertiary); }
+  .link-row a { color: var(--bleu2); text-decoration: none; font-weight: 600; position: relative; }
+  .link-row a::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1.5px; background: var(--brun-doux); transition: width .3s; }
+  .link-row a:hover::after { width: 100%; }
+  .link-row a:hover { text-decoration: none; }
   .spinner {
     display: inline-block; width: 16px; height: 16px;
     border: 2px solid rgba(255,255,255,0.4);

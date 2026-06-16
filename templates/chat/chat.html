@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>COFINANCE CI — Support Client</title>
+  <link rel="stylesheet" href="/static/css/cofinance-theme.css">
   <style>
     * {
       box-sizing: border-box;
@@ -12,8 +13,8 @@
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
+      font-family: var(--font-body);
+      background: var(--bg-page);
       height: 100vh;
       display: flex;
       align-items: center;
@@ -23,17 +24,17 @@
     .chat-container {
       width: 500px;
       height: 650px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
     .chat-header {
-      background: #1a5276;
-      color: white;
+      background: linear-gradient(135deg, var(--brun-tres-fonce), var(--brun-fonce));
+      color: var(--text-on-dark);
       padding: 16px 20px;
       display: flex;
       align-items: center;
@@ -41,8 +42,9 @@
     }
 
     .chat-header h2 {
+      font-family: var(--font-display);
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .chat-header span {
@@ -53,7 +55,7 @@
     .status-dot {
       width: 10px;
       height: 10px;
-      background: #e74c3c;
+      background: var(--terracotta);
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -73,19 +75,20 @@
       border-radius: 12px;
       font-size: 14px;
       line-height: 1.4;
+      animation: fadeInUp 0.3s var(--ease-out);
     }
 
     .message.moi {
       align-self: flex-end;
-      background: #1a5276;
-      color: white;
+      background: linear-gradient(135deg, var(--brun-doux), var(--brun));
+      color: var(--text-on-dark);
       border-bottom-right-radius: 4px;
     }
 
     .message.autre {
       align-self: flex-start;
-      background: #f0f2f5;
-      color: #333;
+      background: var(--beige);
+      color: var(--text-primary);
       border-bottom-left-radius: 4px;
     }
 
@@ -96,6 +99,9 @@
       opacity: 0.7;
     }
 
+    .message.moi .auteur { color: rgba(255,255,255,0.75); }
+    .message.autre .auteur { color: var(--text-tertiary); }
+
     .message .heure {
       font-size: 10px;
       margin-top: 4px;
@@ -105,7 +111,7 @@
 
     .frappe-indicator {
       font-size: 12px;
-      color: #888;
+      color: var(--text-tertiary);
       font-style: italic;
       padding: 0 16px 8px;
       min-height: 20px;
@@ -113,39 +119,43 @@
 
     .input-zone {
       padding: 12px 16px;
-      border-top: 1px solid #eee;
+      border-top: 1px solid var(--border-light);
       display: flex;
       gap: 8px;
+      background: var(--bg-card);
     }
 
     .input-zone input {
       flex: 1;
-      border: 1.5px solid #ddd;
+      border: 1.5px solid var(--border-light);
       border-radius: 24px;
       padding: 10px 16px;
       font-size: 14px;
       outline: none;
       transition: border-color 0.2s;
+      background: var(--bg-input);
     }
 
     .input-zone input:focus {
-      border-color: #1a5276;
+      border-color: var(--brun-doux);
+      box-shadow: 0 0 0 3px rgba(139,115,85,0.15);
     }
 
     .input-zone button {
-      background: #1a5276;
-      color: white;
+      background: var(--brun-doux);
+      color: var(--text-on-dark);
       border: none;
       border-radius: 50%;
       width: 42px;
       height: 42px;
       cursor: pointer;
       font-size: 18px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
     .input-zone button:hover {
-      background: #154360;
+      background: var(--brun);
+      transform: scale(1.05);
     }
 
     .login-zone {
@@ -156,34 +166,43 @@
     }
 
     .login-zone h3 {
-      color: #1a5276;
+      font-family: var(--font-display);
+      color: var(--brun-fonce);
       margin-bottom: 8px;
     }
 
     .login-zone input {
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-md);
       padding: 10px 14px;
       font-size: 14px;
       outline: none;
+      background: var(--bg-input);
+      transition: border-color 0.2s;
+    }
+
+    .login-zone input:focus {
+      border-color: var(--brun-doux);
+      box-shadow: 0 0 0 3px rgba(139,115,85,0.15);
     }
 
     .login-zone button {
-      background: #1a5276;
-      color: white;
+      background: var(--brun-doux);
+      color: var(--text-on-dark);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       padding: 12px;
       cursor: pointer;
       font-weight: 600;
+      transition: background 0.2s;
     }
 
     .login-zone button:hover {
-      background: #154360;
+      background: var(--brun);
     }
 
     .error {
-      color: #e74c3c;
+      color: var(--terracotta-fonce);
       font-size: 13px;
     }
   </style>
@@ -214,9 +233,10 @@
       <div class="messages-zone" id="messages-zone"></div>
       <div class="frappe-indicator" id="frappe-indicator"></div>
       <div class="input-zone">
-        <input type="text" id="message-input" placeholder="Écrivez votre message..." onkeypress="gererTouche(event)"
-          oninput="signalerFrappe()" />
-        <button onclick="envoyerMessage()"></button>
+        <form id="send-form" style="display:flex;flex:1;gap:8px">
+          <input type="text" id="message-input" placeholder="Écrivez votre message..." oninput="signalerFrappe()" />
+          <button type="submit"></button>
+        </form>
       </div>
     </div>
 
@@ -340,7 +360,6 @@
     function afficherMessage(msg) {
       const zone = document.getElementById('messages-zone');
 
-      // Récupérer l'ID auteur — peut venir de auteur_id (WebSocket) ou auteur (API)
       const auteurId = parseInt(msg.auteur_id !== undefined ? msg.auteur_id : msg.auteur);
       const estMoi = auteurId === monUserId;
 
@@ -363,7 +382,15 @@
       zone.scrollTop = zone.scrollHeight;
     }
 
+    let sending = false;
+
+    document.getElementById('send-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      envoyerMessage();
+    });
+
     function envoyerMessage() {
+      if (sending) return;
       const input = document.getElementById('message-input');
       const contenu = input.value.trim();
 
@@ -373,12 +400,10 @@
         return;
       }
 
+      sending = true;
       socket.send(JSON.stringify({ type: 'message', contenu }));
       input.value = '';
-    }
-
-    function gererTouche(e) {
-      if (e.key === 'Enter') envoyerMessage();
+      sending = false;
     }
 
     function signalerFrappe() {

@@ -5,22 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>COFINANCE CI — Mon espace</title>
+  <link rel="stylesheet" href="/static/css/cofinance-theme.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
-      --bleu: #1A5276;
-      --bleu2: #2471A3;
-      --bleu-clair: #D6EAF8;
-      --or: #D4AC0D;
-      --bg: #F0F4F8;
-      --blanc: #FFFFFF;
-      --gris: #6C7A89;
-      --gris2: #ECF0F1;
-      --rouge: #C0392B;
-      --vert: #1E8449;
-      --vert2: #D5F5E3;
-      --radius: 10px;
-      --shadow: 0 2px 12px rgba(26, 82, 118, 0.10);
+      --bleu: var(--brun-doux);
+      --bleu2: var(--brun);
+      --bleu-clair: var(--beige);
+      --or: var(--or-cuivre);
+      --bg: var(--bg-page);
+      --blanc: var(--blanc-casse);
+      --gris: var(--text-tertiary);
+      --gris2: var(--beige);
+      --rouge: var(--terracotta);
+      --vert: var(--vert-olive);
+      --vert2: var(--vert-olive);
+      --radius: var(--radius-md);
+      --shadow: var(--shadow-sm);
     }
 
     * {
@@ -1024,6 +1025,14 @@
     const profil = JSON.parse(localStorage.getItem('profil') || 'null');
     if (!profil) { window.location.href = '/login/'; }
 
+    function userIdFromJwt() {
+      try {
+        const t = localStorage.getItem('token');
+        if (!t) return null;
+        const b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(b64)).user_id;
+      } catch(e) { return null; }
+    }
     const estAdmin = profil && (profil.role === 'ADMIN' || profil.role === 'AGENT');
 
     // Remplir l'en-tête sidebar
@@ -1940,7 +1949,7 @@
           afficherMsg(data.message);
         } else if (data.type === 'frappe') {
           const fz = document.getElementById('frappe-zone');
-          if (fz && parseInt(data.auteur_id) !== parseInt(profil.id)) {
+          if (fz && parseInt(data.auteur_id ?? data.auteur) !== userIdFromJwt()) {
             fz.textContent = `${data.auteur_nom} est en train d'écrire…`;
             clearTimeout(window._frappTimer);
             window._frappTimer = setTimeout(() => { if (fz) fz.textContent = ''; }, 3000);
@@ -1952,7 +1961,7 @@
     function afficherMsg(msg) {
       const zone = document.getElementById('messages-zone');
       if (!zone) return;
-      const moi = parseInt(msg.auteur_id ?? msg.auteur) === parseInt(profil.id);
+      const moi = parseInt(msg.auteur_id ?? msg.auteur) === userIdFromJwt();
       const heure = new Date(msg.created_at).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' });
       const div = document.createElement('div');
       div.style.cssText = `display:flex;flex-direction:column;align-items:${moi ? 'flex-end' : 'flex-start'}`;

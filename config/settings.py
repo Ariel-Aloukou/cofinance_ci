@@ -149,6 +149,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Dossier où Django stocke les fichiers uploadés
 MEDIA_URL  = "/media/"
