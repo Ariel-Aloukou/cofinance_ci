@@ -826,7 +826,7 @@
         <!-- rempli par JS selon le rôle -->
       </nav>
       <div class="sidebar-footer">
-        <button class="btn-logout" onclick="seDeconnecter()">🚪 Se déconnecter</button>
+        <button class="btn-logout" onclick="seDeconnecter()"> Se déconnecter</button>
       </div>
     </aside>
 
@@ -836,7 +836,7 @@
         <div class="topbar-title" id="page-title">Tableau de bord</div>
         <div class="topbar-right">
           <div class="notif-badge" onclick="afficherPage('notifications')" title="Notifications">
-            🔔 <span class="badge" id="notif-count" style="display:none">0</span>
+            <span class="badge" id="notif-count" style="display:none">0</span>
           </div>
           <div style="font-size:13px;color:var(--gris)" id="topbar-name"></div>
         </div>
@@ -887,6 +887,94 @@
     // ═══════════════════════════════════════════════════════════
     // UTILITAIRES
     // ═══════════════════════════════════════════════════════════
+
+    let evalConvId = null;
+    let evalNpsChoisi = null;
+    let evalSatisChoisie = null;
+
+    function ouvrirModalEvaluation(convId) {
+      evalConvId = convId;
+      evalNpsChoisi = null;
+      evalSatisChoisie = null;
+      document.getElementById('eval-commentaire').value = '';
+
+      // Générer les boutons NPS 0-10
+      const npsZone = document.getElementById('nps-buttons');
+      npsZone.innerHTML = Array.from({ length: 11 }, (_, i) => `
+    <button onclick="choisirNps(${i})" id="nps-btn-${i}"
+      style="width:38px;height:38px;border-radius:8px;border:1.5px solid #D5D8DC;
+             background:#fff;font-weight:700;cursor:pointer;font-size:13px;transition:all .15s">
+      ${i}
+    </button>`).join('');
+
+      // Générer les étoiles 1-5
+      const starsZone = document.getElementById('stars-buttons');
+      starsZone.innerHTML = Array.from({ length: 5 }, (_, i) => `
+    <span onclick="choisirSatisfaction(${i + 1})" id="star-${i + 1}"
+      style="cursor:pointer;color:#D5D8DC;transition:color .15s">★</span>`).join('');
+
+      ouvrirModal('modal-evaluation');
+    }
+
+    function choisirNps(valeur) {
+      evalNpsChoisi = valeur;
+      for (let i = 0; i <= 10; i++) {
+        const btn = document.getElementById(`nps-btn-${i}`);
+        if (i === valeur) {
+          btn.style.background = i >= 9 ? 'var(--vert)' : i >= 7 ? 'var(--or)' : 'var(--rouge)';
+          btn.style.color = '#fff';
+          btn.style.borderColor = 'transparent';
+        } else {
+          btn.style.background = '#fff';
+          btn.style.color = '#2C3E50';
+          btn.style.borderColor = '#D5D8DC';
+        }
+      }
+    }
+
+    function choisirSatisfaction(valeur) {
+      evalSatisChoisie = valeur;
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`star-${i}`).style.color =
+          i <= valeur ? 'var(--or)' : '#D5D8DC';
+      }
+    }
+
+    async function soumettreEvaluation() {
+      if (evalNpsChoisi === null) {
+        toast('Veuillez choisir une note NPS (0 à 10).', 'error'); return;
+      }
+      if (evalSatisChoisie === null) {
+        toast('Veuillez choisir une note de satisfaction (1 à 5 étoiles).', 'error'); return;
+      }
+
+      const btn = document.getElementById('btn-eval-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Envoi…';
+
+      try {
+        const r = await API('/chat/evaluations/', {
+          method: 'POST',
+          body: JSON.stringify({
+            conversation: evalConvId,
+            note_nps: evalNpsChoisi,
+            note_satisfaction: evalSatisChoisie,
+            commentaire: document.getElementById('eval-commentaire').value.trim(),
+          }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
+
+        toast('Merci pour votre évaluation !', 'success');
+        fermerModal('modal-evaluation');
+        chargerConversations();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer mon évaluation';
+      }
+    }
     const API = (path, opts = {}) => {
       const token = localStorage.getItem('token');
       return fetch('/api' + path, {
@@ -949,19 +1037,19 @@
 
     // Navigation selon le rôle
     const navClient = [
-      { icon: '🏠', label: 'Tableau de bord', page: 'dashboard' },
-      { icon: '💳', label: 'Mes crédits', page: 'credits' },
-      { icon: '🛡️', label: 'Assurance', page: 'assurance' },
-      { icon: '🔔', label: 'Notifications', page: 'notifications' },
-      { icon: '💬', label: 'Support chat', page: 'chat' },
+      { icon: '', label: 'Tableau de bord', page: 'dashboard' },
+      { icon: '', label: 'Mes crédits', page: 'credits' },
+      { icon: '', label: 'Assurance', page: 'assurance' },
+      { icon: '', label: 'Notifications', page: 'notifications' },
+      { icon: '', label: 'Support chat', page: 'chat' },
     ];
     const navAdmin = [
-      { icon: '📊', label: 'Tableau de bord', page: 'dashboard' },
-      { icon: '💳', label: 'Dossiers crédits', page: 'gestion-credits' },
-      { icon: '💳', label: 'Crédits', page: 'credits' },
-      { icon: '💰', label: 'Remboursements', page: 'remboursements' },
-      { icon: '🛡️', label: 'Assurance', page: 'assurance' },      { icon: '💬', label: 'Support chat', page: 'chat' },
-      { icon: '🔔', label: 'Notifications', page: 'notifications' },
+      { icon: '', label: 'Tableau de bord', page: 'dashboard' },
+      { icon: '', label: 'Dossiers crédits', page: 'gestion-credits' },
+      { icon: '', label: 'Crédits', page: 'credits' },
+      { icon: '', label: 'Remboursements', page: 'remboursements' },
+      { icon: '', label: 'Assurance', page: 'assurance' }, { icon: '', label: 'Support chat', page: 'chat' },
+      { icon: '', label: 'Notifications', page: 'notifications' },
     ];
     const navItems = estAdmin ? navAdmin : navClient;
     const navEl = document.getElementById('nav-links');
@@ -1024,7 +1112,7 @@
       const c = document.getElementById('page-content');
       c.innerHTML = `
     <div style="margin-bottom:8px;font-size:18px;font-weight:700;color:var(--bleu)">
-      Bonjour, ${profil.first_name} ${profil.last_name} 👋
+      Bonjour, ${profil.first_name} ${profil.last_name} 
     </div>
     <div style="color:var(--gris);font-size:13px;margin-bottom:24px">
       Bienvenue sur votre espace COFINANCE CI
@@ -1067,7 +1155,7 @@
         if (cl.length === 0) {
           document.getElementById('credits-rapide').innerHTML = `
         <div class="empty-state">
-          <div class="icon">💳</div>
+          <div class="icon"></div>
           <p>Aucun crédit pour l'instant.</p>
           <button class="btn btn-primary" style="margin-top:14px" onclick="ouvrirModal('modal-credit')">Faire une demande</button>
         </div>`;
@@ -1099,7 +1187,7 @@
       const c = document.getElementById('page-content');
       c.innerHTML = `
     <div class="tabs">
-      <div class="tab active" onclick="switchTabGlobal(event,'t-tous-credits')">📋 Tous les dossiers</div>
+      <div class="tab active" onclick="switchTabGlobal(event,'t-tous-credits')"> Tous les dossiers</div>
       <div class="tab" onclick="switchTabGlobal(event,'t-en-attente')">⏳ En attente</div>
     </div>
     <div class="tab-content active" id="t-tous-credits">
@@ -1126,7 +1214,7 @@
 
         // Fonction commune pour rendre le tableau
         const renderTable = (liste) => liste.length === 0
-          ? '<div class="empty-state"><div class="icon">📋</div><p>Aucun dossier.</p></div>'
+          ? '<div class="empty-state"><div class="icon"></div><p>Aucun dossier.</p></div>'
           : `<div class="table-wrap"><table>
           <thead>
             <tr>
@@ -1163,16 +1251,16 @@
                   ${cr.statut === 'EN_ANALYSE' ? `
                     <button class="btn btn-success btn-sm" style="margin-left:4px"
                       onclick="ouvrirModalValidation(${cr.id},'APPROUVEE')">
-                      ✓ Approuver
+                       Approuver
                     </button>
                     <button class="btn btn-danger btn-sm" style="margin-left:4px"
                       onclick="ouvrirModalValidation(${cr.id},'REJETEE')">
-                      ✗ Rejeter
+                       Rejeter
                     </button>` : ''}
                   ${cr.statut === 'APPROUVEE' ? `
                     <button class="btn btn-success btn-sm" style="margin-left:4px"
                       onclick="changerStatutCredit(${cr.id},'DECAISSEE','Fonds décaissés')">
-                      💰 Décaisser
+                       Décaisser
                     </button>` : ''}
                 </td>
               </tr>`).join('')}
@@ -1229,15 +1317,15 @@
 
       // Adapter le contenu selon l'action
       if (nouveauStatut === 'APPROUVEE') {
-        document.getElementById('mv-titre').textContent = '✓ Approuver le crédit';
+        document.getElementById('mv-titre').textContent = ' Approuver le crédit';
         document.getElementById('mv-champ-montant').style.display = 'block';
         document.getElementById('mv-btn-confirmer').className = 'btn btn-success';
-        document.getElementById('mv-btn-confirmer').textContent = '✓ Confirmer l\'approbation';
+        document.getElementById('mv-btn-confirmer').textContent = ' Confirmer l\'approbation';
       } else {
-        document.getElementById('mv-titre').textContent = '✗ Rejeter le crédit';
+        document.getElementById('mv-titre').textContent = ' Rejeter le crédit';
         document.getElementById('mv-champ-montant').style.display = 'none';
         document.getElementById('mv-btn-confirmer').className = 'btn btn-danger';
-        document.getElementById('mv-btn-confirmer').textContent = '✗ Confirmer le rejet';
+        document.getElementById('mv-btn-confirmer').textContent = ' Confirmer le rejet';
       }
 
       modal.classList.add('open');
@@ -1273,8 +1361,8 @@
 
         toast(
           nouveauStatut === 'APPROUVEE'
-            ? '✓ Crédit approuvé avec succès !'
-            : '✗ Crédit rejeté.',
+            ? ' Crédit approuvé avec succès !'
+            : ' Crédit rejeté.',
           nouveauStatut === 'APPROUVEE' ? 'success' : 'error'
         );
         modal.classList.remove('open');
@@ -1299,7 +1387,7 @@
 
         const messages = {
           'EN_ANALYSE': 'Dossier pris en charge.',
-          'DECAISSEE': '💰 Fonds décaissés avec succès !',
+          'DECAISSEE': ' Fonds décaissés avec succès !',
         };
         toast(messages[statut] || 'Statut mis à jour.', 'success');
         await chargerTousLesCredits();
@@ -1333,7 +1421,7 @@
         if (credits.length === 0) {
           document.getElementById('liste-credits').innerHTML = `
         <div class="empty-state">
-          <div class="icon">💳</div><p>Aucune demande de crédit.</p>
+          <div class="icon"></div><p>Aucune demande de crédit.</p>
           <button class="btn btn-primary" style="margin-top:14px" onclick="ouvrirModal('modal-credit')">Faire ma première demande</button>
         </div>`;
           return;
@@ -1358,7 +1446,7 @@
       </table></div>
       <div style="margin-top:12px; padding: 16px; border-top: 1px solid #EEF1F3;">
         <button class="btn btn-outline btn-sm" onclick="afficherPage('assurance')">
-          🛡️ Voir mes polices d'assurance
+           Voir mes polices d'assurance
         </button>
       </div>`;
       } catch (e) { toast(e.message, 'error'); }
@@ -1387,7 +1475,7 @@
       detailZone.innerHTML = `
     <div class="section-title" style="margin-top:24px">
       Détail — Crédit #${id}
-      <span onclick="document.getElementById('detail-credit-zone').innerHTML=''" style="cursor:pointer;font-size:13px;color:var(--gris)">✕ Fermer</span>
+      <span onclick="document.getElementById('detail-credit-zone').innerHTML=''" style="cursor:pointer;font-size:13px;color:var(--gris)"> Fermer</span>
     </div>
     <div class="card">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
@@ -1398,9 +1486,9 @@
       </div>
 
       <div class="tabs">
-        <div class="tab active" onclick="switchTab(event,'t-historique')">📋 Historique</div>
-        <div class="tab" onclick="switchTab(event,'t-echeancier')">📅 Échéancier</div>
-        <div class="tab" onclick="switchTab(event,'t-pieces')">📎 Pièces justificatives</div>
+        <div class="tab active" onclick="switchTab(event,'t-historique')"> Historique</div>
+        <div class="tab" onclick="switchTab(event,'t-echeancier')"> Échéancier</div>
+        <div class="tab" onclick="switchTab(event,'t-pieces')"> Pièces justificatives</div>
       </div>
 
       <!-- HISTORIQUE -->
@@ -1434,7 +1522,7 @@
                     <td>${formatMontant(e.montant_capital)}</td>
                     <td>${formatMontant(e.montant_interet)}</td>
                     <td><strong>${formatMontant(e.montant_total)}</strong></td>
-                    <td>${e.est_paye ? '<span style="color:var(--vert)">✓ Payé</span>' : '<span style="color:var(--rouge)">En attente</span>'}</td>
+                    <td>${e.est_paye ? '<span style="color:var(--vert)"> Payé</span>' : '<span style="color:var(--rouge)">En attente</span>'}</td>
                   </tr>`).join('')}
               </tbody>
             </table></div>`}
@@ -1446,7 +1534,7 @@
           <div class="upload-zone" onclick="document.getElementById('file-input-${id}').click()">
             <input type="file" id="file-input-${id}" accept=".pdf,.jpg,.jpeg,.png"
                    onchange="uploadPiece(${id}, this)" />
-            <div style="font-size:32px;margin-bottom:8px">📎</div>
+            <div style="font-size:32px;margin-bottom:8px"></div>
             <div style="font-size:14px;font-weight:700;color:var(--bleu)">Cliquer pour ajouter un document</div>
             <div style="font-size:12px;color:var(--gris);margin-top:4px">PDF, JPG, PNG — Max 10 Mo</div>
           </div>
@@ -1466,7 +1554,7 @@
           ? '<div class="empty-state"><p>Aucun document uploadé.</p></div>'
           : pcs.map(p => `
                 <div class="upload-item">
-                  <span class="icon">✓</span>
+                  <span class="icon"></span>
                   <span style="flex:1">${p.nom_original || p.type_document}</span>
                   <a href="${p.url_telechargement}" target="_blank" style="font-size:12px;color:var(--bleu2)">Télécharger</a>
                 </div>`).join('')}
@@ -1500,7 +1588,7 @@
         document.getElementById(`pieces-list-${demandeId}`).innerHTML =
           pcs.map(p => `
         <div class="upload-item">
-          <span class="icon">✓</span>
+          <span class="icon"></span>
           <span style="flex:1">${p.nom_original || p.type_document}</span>
           <a href="${p.url_telechargement}" target="_blank" style="font-size:12px;color:var(--bleu2)">Télécharger</a>
         </div>`).join('');
@@ -1560,8 +1648,8 @@
         <button class="btn btn-primary" onclick="ouvrirModal('modal-new-formule')">+ Nouvelle formule</button>
      </div>` : ''}
     <div class="tabs">
-      <div class="tab active" onclick="switchTabGlobal(event,'t-catalogue')">📋 Catalogue</div>
-      <div class="tab" onclick="switchTabGlobal(event,'t-mes-polices')">🛡️ Mes polices</div>
+      <div class="tab active" onclick="switchTabGlobal(event,'t-catalogue')"> Catalogue</div>
+      <div class="tab" onclick="switchTabGlobal(event,'t-mes-polices')"> Mes polices</div>
     </div>
     <div class="tab-content active" id="t-catalogue">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
@@ -1584,7 +1672,7 @@
         const dejaSouscrits = new Set(polices.map(p => p.formule));
 
         document.getElementById('t-catalogue').innerHTML = formules.length === 0
-          ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune formule disponible.</p></div>'
+          ? '<div class="empty-state"><div class="icon"></div><p>Aucune formule disponible.</p></div>'
           : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
           ${formules.map(f => {
             const dejaFait = dejaSouscrits.has(f.id);
@@ -1605,7 +1693,7 @@
                 <div style="font-size:12px;color:var(--gris);margin-bottom:14px">Durée : ${f.duree_mois} mois</div>
                 ${!estAdmin
                 ? dejaFait
-                  ? `<div style="background:var(--vert2);color:var(--vert);border-radius:var(--radius);padding:10px;text-align:center;font-weight:700">✓ Déjà souscrit</div>`
+                  ? `<div style="background:var(--vert2);color:var(--vert);border-radius:var(--radius);padding:10px;text-align:center;font-weight:700"> Déjà souscrit</div>`
                   : `<button class="btn btn-success" style="width:100%" onclick="souscrire(${f.id},'${f.nom}')">Souscrire</button>`
                 : ''
               }
@@ -1621,7 +1709,7 @@
 
     function afficherMesPolices(polices) {
       document.getElementById('t-mes-polices').innerHTML = polices.length === 0
-        ? '<div class="empty-state"><div class="icon">🛡️</div><p>Aucune souscription active.</p></div>'
+        ? '<div class="empty-state"><div class="icon"></div><p>Aucune souscription active.</p></div>'
         : `<div class="table-wrap"><table>
         <thead><tr><th>#</th><th>Formule</th><th>Statut</th><th>Souscrit le</th><th>Expire le</th><th>Jours restants</th></tr></thead>
         <tbody>
@@ -1660,7 +1748,7 @@
       c.innerHTML = `
     <div class="section-title">
       Mes notifications
-      <button class="btn btn-outline btn-sm" onclick="toutMarquerLu()">✓ Tout marquer comme lu</button>
+      <button class="btn btn-outline btn-sm" onclick="toutMarquerLu()"> Tout marquer comme lu</button>
     </div>
     <div class="card" id="liste-notifs">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
@@ -1675,15 +1763,15 @@
         const d = await r.json();
         const notifs = d.results || d;
         const icons = {
-          CREDIT_STATUT: '💳', REMBOURSEMENT: '💰',
-          ASSURANCE: '🛡️', ALERTE_ECHEANCE: '⚠️', ALERTE_ASSURANCE: '⏰',
+          CREDIT_STATUT: '', REMBOURSEMENT: '',
+          ASSURANCE: '', ALERTE_ECHEANCE: '', ALERTE_ASSURANCE: '⏰',
         };
         document.getElementById('liste-notifs').innerHTML = notifs.length === 0
-          ? '<div class="empty-state"><div class="icon">🔔</div><p>Aucune notification.</p></div>'
+          ? '<div class="empty-state"><div class="icon"></div><p>Aucune notification.</p></div>'
           : notifs.map(n => `
           <div class="notif-item ${!n.est_lu ? 'unread' : ''}"
                onclick="voirNotif(${n.id},'${n.titre.replace(/'/g, "\\'")}',\`${n.message.replace(/`/g, '\\`')}\`,'${n.created_at}',this)">
-            <div class="notif-icon">${icons[n.type_notification] || '🔔'}</div>
+            <div class="notif-icon">${icons[n.type_notification] || ''}</div>
             <div class="notif-body" style="flex:1">
               <div class="notif-title">${n.titre}</div>
               <div class="notif-msg">${n.message.substring(0, 80)}${n.message.length > 80 ? '…' : ''}</div>
@@ -1762,7 +1850,7 @@
       <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column" id="chat-right">
         <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--gris)">
           <div style="text-align:center">
-            <div style="font-size:40px;margin-bottom:10px">💬</div>
+            <div style="font-size:40px;margin-bottom:10px"></div>
             <p>Sélectionnez une conversation</p>
           </div>
         </div>
@@ -1781,17 +1869,24 @@
         const r = await API('/chat/conversations/');
         const d = await r.json();
         const convs = d.results || d;
+
         document.getElementById('liste-convs').innerHTML = convs.length === 0
           ? '<div class="empty-state"><p>Aucune conversation.</p></div>'
           : convs.map(cv => `
-          <div onclick="ouvrirConversation(${cv.id},'${cv.sujet}')"
-               style="padding:12px 16px;border-bottom:1px solid #EEF1F3;cursor:pointer;transition:background .15s"
+          <div style="padding:12px 16px;border-bottom:1px solid #EEF1F3;cursor:pointer;transition:background .15s"
                onmouseover="this.style.background='#F8F9FA'" onmouseout="this.style.background=''">
-            <div style="font-size:13px;font-weight:700;color:var(--bleu)">${cv.sujet}</div>
-            <div style="font-size:12px;color:var(--gris);margin-top:3px">
-              ${cv.agent_nom || 'En attente d\'agent'} · ${cv.nb_messages} msg
+            <div onclick="ouvrirConversation(${cv.id},'${cv.sujet.replace(/'/g, "\\'")}')">
+              <div style="font-size:13px;font-weight:700;color:var(--bleu)">${cv.sujet}</div>
+              <div style="font-size:12px;color:var(--gris);margin-top:3px">
+                ${cv.agent_nom || 'En attente d\'agent'} · ${cv.nb_messages} msg
+              </div>
+              <div style="margin-top:4px">${badgeStatut(cv.statut)}</div>
             </div>
-            <div style="margin-top:4px">${badgeStatut(cv.statut)}</div>
+            ${cv.statut === 'FERMEE' && !estAdmin ? `
+              <button class="btn btn-outline btn-sm" style="margin-top:8px;width:100%"
+                onclick="event.stopPropagation(); ouvrirModalEvaluation(${cv.id})">
+                ⭐ Évaluer cette conversation
+              </button>` : ''}
           </div>`).join('');
       } catch (e) { }
     }
@@ -1807,8 +1902,8 @@
       const right = document.getElementById('chat-right');
       right.innerHTML = `
     <div style="padding:12px 16px;border-bottom:1px solid #EEF1F3;font-weight:700;color:var(--bleu);display:flex;align-items:center;justify-content:space-between">
-      <span>💬 ${sujet}</span>
-      <span style="font-size:11px;color:var(--gris)" id="ws-status">⚪ Connexion…</span>
+      <span> ${sujet}</span>
+      <span style="font-size:11px;color:var(--gris)" id="ws-status"> Connexion…</span>
     </div>
     <div id="messages-zone" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
     <div id="frappe-zone" style="padding:0 16px 4px;font-size:12px;color:var(--gris);font-style:italic;min-height:18px"></div>
@@ -1817,7 +1912,7 @@
              style="flex:1;border:1.5px solid #D5D8DC;border-radius:24px;padding:10px 16px;font-size:13px;outline:none"
              oninput="sendFrappe()"
              onkeypress="if(event.key==='Enter')envoyerMsg()" />
-      <button onclick="envoyerMsg()" style="background:var(--bleu);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:16px">➤</button>
+      <button onclick="envoyerMsg()" style="background:var(--bleu);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:16px"></button>
     </div>
   `;
 
@@ -1837,7 +1932,7 @@
       };
       chatSocket.onclose = () => {
         const el = document.getElementById('ws-status');
-        if (el) el.textContent = '🔴 Déconnecté';
+        if (el) el.textContent = ' Déconnecté';
       };
       chatSocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
@@ -1880,12 +1975,12 @@
 
     let _frappeSent = false;
     function sendFrappe() {
-        if (!chatSocket || chatSocket.readyState !== 1) return;
-        if (!_frappeSent) {
-            chatSocket.send(JSON.stringify({ type: 'frappe' }));
-            _frappeSent = true;
-            setTimeout(() => { _frappeSent = false; }, 2000);
-        }
+      if (!chatSocket || chatSocket.readyState !== 1) return;
+      if (!_frappeSent) {
+        chatSocket.send(JSON.stringify({ type: 'frappe' }));
+        _frappeSent = true;
+        setTimeout(() => { _frappeSent = false; }, 2000);
+      }
     }
 
     async function nouvelleConversation() {
@@ -1910,11 +2005,24 @@
       document.getElementById('page-title').textContent = 'Tableau de bord';
       const c = document.getElementById('page-content');
       c.innerHTML = `
-    <div class="stat-grid" id="admin-stats">
+    <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">Crédits soumis</div><div class="stat-value" id="a-soumis">…</div></div>
       <div class="stat-card or"><div class="stat-label">En analyse</div><div class="stat-value" id="a-analyse">…</div></div>
       <div class="stat-card vert"><div class="stat-label">Approuvés</div><div class="stat-value" id="a-approuves">…</div></div>
       <div class="stat-card rouge"><div class="stat-label">Taux recouvrement</div><div class="stat-value" id="a-taux">…</div></div>
+    </div>
+
+    <div class="stat-grid" style="margin-top:0">
+      <div class="stat-card" style="border-left-color:#8E44AD">
+        <div class="stat-label">NPS Global</div>
+        <div class="stat-value" id="a-nps" style="color:#8E44AD">…</div>
+        <div class="stat-sub" id="a-nps-sub">Objectif : 65 points</div>
+      </div>
+      <div class="stat-card" style="border-left-color:#16A085">
+        <div class="stat-label">Satisfaction moyenne</div>
+        <div class="stat-value" id="a-satisfaction" style="color:#16A085">…</div>
+        <div class="stat-sub">Sur 5 étoiles</div>
+      </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
@@ -1935,21 +2043,31 @@
   `;
 
       try {
-        const [rs, rca] = await Promise.all([
+        const [rs, rca, rnps] = await Promise.all([
           API('/dashboard/stats/'),
           API('/dashboard/conversations-en-attente/'),
+          API('/chat/nps/'),
         ]);
         const stats = await rs.json();
         const attente = await rca.json();
+        const nps = await rnps.json();
 
-        // Stats
+        // Stats crédits (inchangé)
         const ps = stats.credits_par_statut || {};
         document.getElementById('a-soumis').textContent = ps.SOUMISE || 0;
         document.getElementById('a-analyse').textContent = ps.EN_ANALYSE || 0;
         document.getElementById('a-approuves').textContent = ps.APPROUVEE || 0;
         document.getElementById('a-taux').textContent = (stats.taux_recouvrement_pct || 0) + '%';
 
-        // Graphique statuts
+        // NPS
+        document.getElementById('a-nps').textContent = nps.nps ?? '—';
+        document.getElementById('a-nps-sub').innerHTML = nps.total_reponses === 0
+          ? 'Aucune évaluation pour le moment'
+          : `${nps.atteint ? '✅' : '⚠️'} ${nps.total_reponses} réponse(s) — Objectif : 65 pts`;
+        document.getElementById('a-satisfaction').textContent =
+          nps.satisfaction_moyenne != null ? nps.satisfaction_moyenne + '/5' : '—';
+
+        // Graphiques (inchangé)
         new Chart(document.getElementById('chart-statuts'), {
           type: 'doughnut',
           data: {
@@ -1959,25 +2077,19 @@
           options: { plugins: { legend: { position: 'bottom' } }, responsive: true }
         });
 
-        // Graphique assurances
-        // Remplacer le graphique assurances par un affichage plus lisible
         new Chart(document.getElementById('chart-assurances'), {
           type: 'doughnut',
           data: {
             labels: ['Actives', 'Expirées', 'Résiliées'],
             datasets: [{
-              data: [
-                stats.souscriptions_actives || 0,
-                stats.souscriptions_expirees || 0,
-                stats.souscriptions_resiliees || 0,
-              ],
+              data: [stats.souscriptions_actives || 0, stats.souscriptions_expirees || 0, stats.souscriptions_resiliees || 0],
               backgroundColor: ['#1E8449', '#C0392B', '#AEB6BF'],
             }]
           },
           options: { plugins: { legend: { position: 'bottom' } }, responsive: true }
         });
 
-        // Conversations en attente
+        // Conversations en attente (inchangé)
         const convs = attente.conversations || [];
         document.getElementById('convs-attente').innerHTML = convs.length === 0
           ? '<div class="empty-state"><div class="icon">✅</div><p>Aucune conversation en attente.</p></div>'
@@ -1986,12 +2098,10 @@
           <tbody>
             ${convs.map(cv => `
               <tr>
-                <td>${cv.id}</td>
-                <td>${cv.client_nom}</td>
-                <td>${cv.client_region || '—'}</td>
+                <td>${cv.id}</td><td>${cv.client_nom}</td><td>${cv.client_region || '—'}</td>
                 <td>${cv.sujet}</td>
                 <td style="color:${cv.attente_minutes > 60 ? 'var(--rouge)' : 'var(--vert)'}"><strong>${cv.attente_minutes} min</strong></td>
-                <td><button class="btn btn-primary btn-sm" onclick="afficherPage('chat'); setTimeout(() => ouvrirConversation(${cv.id}, '${cv.sujet.replace(/'/g, "\\'")}'), 300)">Ouvrir</button></td>
+                <td><button class="btn btn-primary btn-sm" onclick="afficherPage('chat')">Ouvrir</button></td>
               </tr>`).join('')}
           </tbody>
         </table></div>`;
@@ -2007,17 +2117,57 @@
       c.innerHTML = `
     <div class="tabs">
       <div class="tab active" onclick="switchTabGlobal(event,'t-alertes')">⚠️ Alertes</div>
+      <div class="tab" onclick="switchTabGlobal(event,'t-enregistrer')">💰 Enregistrer un paiement</div>
       <div class="tab" onclick="switchTabGlobal(event,'t-historique-paie')">📋 Historique</div>
     </div>
     <div class="tab-content active" id="t-alertes">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
+    </div>
+    <div class="tab-content" id="t-enregistrer">
+      <div class="card" style="max-width:500px">
+        <div class="field">
+          <label>ID de l'échéance *</label>
+          <input type="number" id="pp-echeance-id" placeholder="ex: 3" />
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">
+            Trouvez l'ID dans l'onglet "Échéancier" du crédit du client (Mes crédits → Détails)
+          </div>
+        </div>
+        <div class="field">
+          <label>Montant payé (FCFA) *</label>
+          <input type="number" id="pp-montant" placeholder="45000" />
+        </div>
+        <div class="field">
+          <label>Moyen de paiement *</label>
+          <select id="pp-moyen">
+            <option value="ORANGE_MONEY">Orange Money</option>
+            <option value="WAVE">Wave</option>
+            <option value="MTN_MOMO">MTN MoMo</option>
+            <option value="ESPECES">Espèces</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Référence transaction</label>
+          <input type="text" id="pp-reference" placeholder="ex: TXN-2026-00123" />
+        </div>
+        <div class="field">
+          <label>Commentaire</label>
+          <textarea id="pp-commentaire" placeholder="Remarques éventuelles…"></textarea>
+        </div>
+        <button class="btn btn-success" style="width:100%" onclick="enregistrerPaiement()" id="btn-paiement">
+          💰 Enregistrer le paiement
+        </button>
+      </div>
     </div>
     <div class="tab-content" id="t-historique-paie">
       <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
     </div>
   `;
 
-      // Alertes
+      await chargerAlertes();
+      await chargerHistoriquePaiements();
+    }
+
+    async function chargerAlertes() {
       try {
         const r = await API('/remboursements/alertes/');
         const d = await r.json();
@@ -2030,13 +2180,14 @@
       ${aVenir.length === 0
             ? '<div class="empty-state"><p>Aucune échéance dans 3 jours.</p></div>'
             : `<div class="table-wrap"><table>
-            <thead><tr><th>Client</th><th>Tél</th><th>Région</th><th>Montant</th><th>Date</th></tr></thead>
+            <thead><tr><th>ID Échéance</th><th>Client</th><th>Tél</th><th>Montant</th><th>Date</th><th></th></tr></thead>
             <tbody>${aVenir.map(e => `
               <tr>
+                <td><strong>#${e.id}</strong></td>
                 <td>${e.client_nom}</td><td>${e.client_tel || '—'}</td>
-                <td>${e.client_region || '—'}</td>
                 <td>${formatMontant(e.montant_total)}</td>
                 <td>${formatDate(e.date_echeance)}</td>
+                <td><button class="btn btn-success btn-sm" onclick="preremplirPaiement(${e.id},${e.montant_total})">Encaisser</button></td>
               </tr>`).join('')}
             </tbody></table></div>`}
       <div class="section-title" style="margin:20px 0 14px">
@@ -2045,19 +2196,71 @@
       ${retard.length === 0
             ? '<div class="empty-state"><p>Aucun retard.</p></div>'
             : `<div class="table-wrap"><table>
-            <thead><tr><th>Client</th><th>Tél</th><th>Région</th><th>Montant</th><th>Date</th></tr></thead>
+            <thead><tr><th>ID Échéance</th><th>Client</th><th>Tél</th><th>Montant</th><th>Date</th><th></th></tr></thead>
             <tbody>${retard.map(e => `
               <tr style="background:#FEF9E7">
+                <td><strong>#${e.id}</strong></td>
                 <td>${e.client_nom}</td><td>${e.client_tel || '—'}</td>
-                <td>${e.client_region || '—'}</td>
                 <td style="color:var(--rouge);font-weight:700">${formatMontant(e.montant_total)}</td>
                 <td style="color:var(--rouge)">${formatDate(e.date_echeance)}</td>
+                <td><button class="btn btn-success btn-sm" onclick="preremplirPaiement(${e.id},${e.montant_total})">Encaisser</button></td>
               </tr>`).join('')}
             </tbody></table></div>`}
     `;
       } catch (e) { }
+    }
 
-      // Historique
+    function preremplirPaiement(echeanceId, montant) {
+      document.getElementById('pp-echeance-id').value = echeanceId;
+      document.getElementById('pp-montant').value = montant;
+      // Basculer vers l'onglet d'enregistrement
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.getElementById('t-enregistrer').classList.add('active');
+    }
+
+    async function enregistrerPaiement() {
+      const payload = {
+        echeance: document.getElementById('pp-echeance-id').value,
+        montant_paye: document.getElementById('pp-montant').value,
+        moyen_paiement: document.getElementById('pp-moyen').value,
+        reference_transaction: document.getElementById('pp-reference').value.trim(),
+        commentaire: document.getElementById('pp-commentaire').value.trim(),
+      };
+
+      if (!payload.echeance || !payload.montant_paye) {
+        toast('Veuillez remplir l\'ID échéance et le montant.', 'error'); return;
+      }
+
+      const btn = document.getElementById('btn-paiement');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Enregistrement…';
+
+      try {
+        const r = await API('/remboursements/paiements/', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(Object.values(d).flat().join(' '));
+
+        toast('Paiement enregistré avec succès !', 'success');
+        document.getElementById('pp-echeance-id').value = '';
+        document.getElementById('pp-montant').value = '';
+        document.getElementById('pp-reference').value = '';
+        document.getElementById('pp-commentaire').value = '';
+        await chargerAlertes();
+        await chargerHistoriquePaiements();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💰 Enregistrer le paiement';
+      }
+    }
+
+    async function chargerHistoriquePaiements() {
       try {
         const r = await API('/remboursements/historique/');
         const d = await r.json();
@@ -2065,7 +2268,7 @@
         document.getElementById('t-historique-paie').innerHTML = paies.length === 0
           ? '<div class="empty-state"><div class="icon">💰</div><p>Aucun paiement enregistré.</p></div>'
           : `<div class="table-wrap"><table>
-          <thead><tr><th>#</th><th>Client</th><th>Montant payé</th><th>Pénalité</th><th>Moyen</th><th>Date</th></tr></thead>
+          <thead><tr><th>#</th><th>Client</th><th>Montant payé</th><th>Pénalité</th><th>Moyen</th><th>Référence</th><th>Date</th></tr></thead>
           <tbody>${paies.map(p => `
             <tr>
               <td>${p.id}</td>
@@ -2075,6 +2278,7 @@
                 ${p.penalite_retard > 0 ? formatMontant(p.penalite_retard) : '—'}
               </td>
               <td>${p.moyen_paiement}</td>
+              <td>${p.reference_transaction || '—'}</td>
               <td>${formatDate(p.date_paiement)}</td>
             </tr>`).join('')}
           </tbody></table></div>`;
@@ -2162,6 +2366,64 @@
       </div>
       <button class="btn btn-primary" onclick="creerFormule()" id="btn-creer-formule">
         Créer la formule
+      </button>
+    </div>
+  </div>
+
+  <!-- MODALE ÉVALUATION NPS -->
+  <div class="modal-overlay" id="modal-evaluation">
+    <div class="modal">
+      <div class="modal-title">
+        Évaluer votre expérience
+        <span class="modal-close" onclick="fermerModal('modal-evaluation')">×</span>
+      </div>
+
+      <div class="field">
+        <label>Sur 10, recommanderiez-vous COFINANCE CI à un proche ? *</label>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="nps-buttons"></div>
+      </div>
+
+      <div class="field" style="margin-top:18px">
+        <label>Votre satisfaction générale (1 à 5) *</label>
+        <div style="display:flex;gap:10px;margin-top:8px;font-size:28px" id="stars-buttons"></div>
+      </div>
+
+      <div class="field">
+        <label>Commentaire (optionnel)</label>
+        <textarea id="eval-commentaire" placeholder="Dites-nous en plus…"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="soumettreEvaluation()" id="btn-eval-submit">
+        Envoyer mon évaluation
+      </button>
+    </div>
+  </div>
+
+  <!-- MODALE ÉVALUATION NPS -->
+  <div class="modal-overlay" id="modal-evaluation">
+    <div class="modal">
+      <div class="modal-title">
+        Évaluer votre expérience
+        <span class="modal-close" onclick="fermerModal('modal-evaluation')">×</span>
+      </div>
+
+      <div class="field">
+        <label>Sur 10, recommanderiez-vous COFINANCE CI à un proche ? *</label>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="nps-buttons"></div>
+      </div>
+
+      <div class="field" style="margin-top:18px">
+        <label>Votre satisfaction générale (1 à 5) *</label>
+        <div style="display:flex;gap:10px;margin-top:8px;font-size:28px" id="stars-buttons"></div>
+      </div>
+
+      <div class="field">
+        <label>Commentaire (optionnel)</label>
+        <textarea id="eval-commentaire" placeholder="Dites-nous en plus…"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="soumettreEvaluation()" id="btn-eval-submit">
+        Envoyer mon évaluation
       </button>
     </div>
   </div>

@@ -35,7 +35,7 @@ class Command(BaseCommand):
         if created:
             admin.set_password('Admin@2026')
             admin.save()
-            self.stdout.write('  ✅ Admin créé')
+            self.stdout.write('   Admin créé')
 
         # ── Agent de terrain ───────────────────────────────────
         agent, created = User.objects.get_or_create(
@@ -52,7 +52,7 @@ class Command(BaseCommand):
         if created:
             agent.set_password('Agent@2026')
             agent.save()
-            self.stdout.write('  ✅ Agent créé')
+            self.stdout.write('   Agent créé')
 
         # ── Client ─────────────────────────────────────────────
         client, created = User.objects.get_or_create(
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         if created:
             client.set_password('Client@2026')
             client.save()
-            self.stdout.write('  ✅ Client créé')
+            self.stdout.write('   Client créé')
 
         # ── Présence de l'agent ────────────────────────────────
         PresenceAgent.objects.get_or_create(
@@ -90,7 +90,7 @@ class Command(BaseCommand):
                 'duree_mois':      12,
             }
         )
-        self.stdout.write('  ✅ Formule assurance créée')
+        self.stdout.write('   Formule assurance créée')
 
         # ── Demande de crédit ──────────────────────────────────
         if not DemandeCredit.objects.filter(client=client).exists():
@@ -105,7 +105,7 @@ class Command(BaseCommand):
                 statut='EN_ANALYSE',
                 score_eligibilite=72,
             )
-            self.stdout.write('  ✅ Demande de crédit créée')
+            self.stdout.write('   Demande de crédit créée')
 
            # Créer un historique de statut pour la demande existante
             demande = DemandeCredit.objects.filter(client=client).first()
@@ -137,7 +137,7 @@ class Command(BaseCommand):
                 auteur=agent,
                 contenu='Bonjour Aya, votre dossier est en cours d\'analyse. Réponse sous 48h.',
             )
-            self.stdout.write('  ✅ Conversation de chat créée')
+            self.stdout.write('   Conversation de chat créée')
             
         conv_fermee = Conversation.objects.filter(statut="FERMEE").first()
         if conv_fermee and not hasattr(conv_fermee, "evaluation"):
@@ -154,7 +154,7 @@ class Command(BaseCommand):
 
         # ── Résumé final ───────────────────────────────────────
         self.stdout.write('')
-        self.stdout.write(self.style.SUCCESS('✅ Données de démonstration chargées !'))
+        self.stdout.write(self.style.SUCCESS(' Données de démonstration chargées !'))
         self.stdout.write('')
         self.stdout.write('Comptes disponibles :')
         self.stdout.write('  Admin  → username: admin_cofinance | password: Admin@2026')
