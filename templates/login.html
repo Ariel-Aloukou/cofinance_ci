@@ -136,7 +136,12 @@ async function seConnecter() {
 
     // Récupérer le profil pour connaître le rôle
     const rp = await fetch('/api/auth/profil/', {
-      headers: { 'Authorization': `Bearer ${data.access}` }
+      headers: {
+          'Authorization': `Bearer ${data.access}`,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+      },
+      cache: 'no-store'
     });
     const profil = await rp.json();
     localStorage.setItem('profil', JSON.stringify(profil));

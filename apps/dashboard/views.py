@@ -69,11 +69,13 @@ class StatsGlobalesView(APIView):
         payees_ech = echeances.filter(est_paye=True).count()
         taux_recouvrement = round(payees_ech / total_ech * 100, 2) if total_ech else 0
  
-        # ─── Souscriptions actives ───────────────────────────────
-        filtre_assurance = Q(statut="ACTIVE")
+        # ─── Souscriptions ───────────────────────────────
+        filtre_assurance = Q()
         if region:
             filtre_assurance &= Q(client__region__icontains=region)
-        souscriptions_actives = Souscription.objects.filter(filtre_assurance).count()
+        souscriptions_actives = Souscription.objects.filter(filtre_assurance, statut="ACTIVE").count()
+        souscriptions_expirees = Souscription.objects.filter(filtre_assurance, statut="EXPIREE").count()
+        souscriptions_resiliees = Souscription.objects.filter(filtre_assurance, statut="RESILIEE").count()
  
         # ─── Conversations support ouvertes ─────────────────────
         conversations_ouvertes = Conversation.objects.filter(
@@ -99,6 +101,8 @@ class StatsGlobalesView(APIView):
             "montant_total_decaisse_fcfa":  float(montant_total_decaisse),
             "taux_recouvrement_pct":        taux_recouvrement,
             "souscriptions_actives":        souscriptions_actives,
+            "souscriptions_expirees":       souscriptions_expirees,
+            "souscriptions_resiliees":      souscriptions_resiliees,
             "conversations_ouvertes":       conversations_ouvertes,
             "conversations_non_traitees":   conversations_non_traitees,
             "date_calcul":                  timezone.now().isoformat(),

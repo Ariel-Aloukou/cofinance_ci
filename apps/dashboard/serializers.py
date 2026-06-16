@@ -13,6 +13,8 @@ class StatsGlobalesSerializer(serializers.Serializer):
     montant_total_decaisse_fcfa   = serializers.FloatField()
     taux_recouvrement_pct         = serializers.FloatField()
     souscriptions_actives         = serializers.IntegerField()
+    souscriptions_expirees        = serializers.IntegerField()
+    souscriptions_resiliees       = serializers.IntegerField()
     conversations_ouvertes        = serializers.IntegerField()
     conversations_non_traitees    = serializers.IntegerField()
     date_calcul                   = serializers.DateTimeField()

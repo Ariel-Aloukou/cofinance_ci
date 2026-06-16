@@ -891,7 +891,10 @@
       const token = localStorage.getItem('token');
       return fetch('/api' + path, {
         ...opts,
+        cache: 'no-store',
         headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
           ...(opts.headers || {}),
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           ...(opts.body && !(opts.body instanceof FormData)
@@ -954,10 +957,10 @@
     ];
     const navAdmin = [
       { icon: '📊', label: 'Tableau de bord', page: 'dashboard' },
+      { icon: '💳', label: 'Dossiers crédits', page: 'gestion-credits' },
       { icon: '💳', label: 'Crédits', page: 'credits' },
       { icon: '💰', label: 'Remboursements', page: 'remboursements' },
-      { icon: '🛡️', label: 'Assurance', page: 'assurance' },
-      { icon: '💬', label: 'Support chat', page: 'chat' },
+      { icon: '🛡️', label: 'Assurance', page: 'assurance' },      { icon: '💬', label: 'Support chat', page: 'chat' },
       { icon: '🔔', label: 'Notifications', page: 'notifications' },
     ];
     const navItems = estAdmin ? navAdmin : navClient;
@@ -1003,6 +1006,7 @@
       document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
       const pages = {
         dashboard: estAdmin ? pageDashboardAdmin : pageDashboardClient,
+        'gestion-credits': pageGestionCredits,
         credits: pageCredits,
         assurance: pageAssurance,
         notifications: pageNotifications,
@@ -1088,6 +1092,221 @@
       } catch (e) { console.error(e); }
     }
 
+    // AJOUTER dans le bloc <script> de app.html
+
+    async function pageGestionCredits() {
+      document.getElementById('page-title').textContent = 'Gestion des crédits';
+      const c = document.getElementById('page-content');
+      c.innerHTML = `
+    <div class="tabs">
+      <div class="tab active" onclick="switchTabGlobal(event,'t-tous-credits')">📋 Tous les dossiers</div>
+      <div class="tab" onclick="switchTabGlobal(event,'t-en-attente')">⏳ En attente</div>
+    </div>
+    <div class="tab-content active" id="t-tous-credits">
+      <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
+    </div>
+    <div class="tab-content" id="t-en-attente">
+      <div class="empty-state"><div class="icon">⏳</div><p>Chargement…</p></div>
+    </div>
+    <div id="detail-credit-zone"></div>
+  `;
+      await chargerTousLesCredits();
+    }
+
+    async function chargerTousLesCredits() {
+      try {
+        const r = await API('/credits/demandes/');
+        const d = await r.json();
+        const credits = d.results || d;
+
+        const tous = credits;
+        const enAttente = credits.filter(cr =>
+          ['SOUMISE', 'EN_ANALYSE'].includes(cr.statut)
+        );
+
+        // Fonction commune pour rendre le tableau
+        const renderTable = (liste) => liste.length === 0
+          ? '<div class="empty-state"><div class="icon">📋</div><p>Aucun dossier.</p></div>'
+          : `<div class="table-wrap"><table>
+          <thead>
+            <tr>
+              <th>#</th><th>Client</th><th>Montant</th><th>Durée</th>
+              <th>Score</th><th>Statut</th><th>Date</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${liste.map(cr => `
+              <tr>
+                <td><strong>#${cr.id}</strong></td>
+                <td>${cr.client_nom || '—'}</td>
+                <td>${formatMontant(cr.montant_demande)}</td>
+                <td>${cr.duree_mois} mois</td>
+                <td>
+                  <strong style="color:${cr.score_eligibilite >= 70 ? 'var(--vert)' :
+              cr.score_eligibilite >= 50 ? 'var(--or)' : 'var(--rouge)'
+            }">
+                    ${cr.score_eligibilite ?? '—'}/100
+                  </strong>
+                </td>
+                <td>${badgeStatut(cr.statut)}</td>
+                <td>${formatDate(cr.date_soumission)}</td>
+                <td>
+                  <button class="btn btn-outline btn-sm"
+                    onclick="voirDetailCreditAdmin(${cr.id})">
+                    Voir
+                  </button>
+                  ${cr.statut === 'SOUMISE' ? `
+                    <button class="btn btn-primary btn-sm" style="margin-left:4px"
+                      onclick="changerStatutCredit(${cr.id},'EN_ANALYSE','')">
+                      Prendre en charge
+                    </button>` : ''}
+                  ${cr.statut === 'EN_ANALYSE' ? `
+                    <button class="btn btn-success btn-sm" style="margin-left:4px"
+                      onclick="ouvrirModalValidation(${cr.id},'APPROUVEE')">
+                      ✓ Approuver
+                    </button>
+                    <button class="btn btn-danger btn-sm" style="margin-left:4px"
+                      onclick="ouvrirModalValidation(${cr.id},'REJETEE')">
+                      ✗ Rejeter
+                    </button>` : ''}
+                  ${cr.statut === 'APPROUVEE' ? `
+                    <button class="btn btn-success btn-sm" style="margin-left:4px"
+                      onclick="changerStatutCredit(${cr.id},'DECAISSEE','Fonds décaissés')">
+                      💰 Décaisser
+                    </button>` : ''}
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table></div>`;
+
+        document.getElementById('t-tous-credits').innerHTML = renderTable(tous);
+        document.getElementById('t-en-attente').innerHTML = renderTable(enAttente);
+      } catch (e) { console.error(e); }
+    }
+
+    async function voirDetailCreditAdmin(id) {
+      // Réutilise la même fonction que côté client
+      await voirDetailCredit(id);
+    }
+
+    function ouvrirModalValidation(creditId, nouveauStatut) {
+      // Créer la modale dynamiquement si elle n'existe pas
+      let modal = document.getElementById('modal-validation-credit');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-validation-credit';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+      <div class="modal">
+        <div class="modal-title">
+          <span id="mv-titre">Validation du crédit</span>
+          <span class="modal-close"
+            onclick="document.getElementById('modal-validation-credit').classList.remove('open')">×</span>
+        </div>
+        <div id="mv-champ-montant" style="display:none">
+          <div class="field">
+            <label>Montant approuvé (FCFA) *</label>
+            <input type="number" id="mv-montant"
+                   placeholder="Peut différer du montant demandé" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Commentaire</label>
+          <textarea id="mv-commentaire"
+                    placeholder="Motif de la décision…"></textarea>
+        </div>
+        <button class="btn btn-primary" id="mv-btn-confirmer"
+                onclick="confirmerValidation()">
+          Confirmer
+        </button>
+      </div>`;
+        document.body.appendChild(modal);
+      }
+
+      // Stocker les infos dans des attributs data
+      modal.dataset.creditId = creditId;
+      modal.dataset.nouveauStatut = nouveauStatut;
+
+      // Adapter le contenu selon l'action
+      if (nouveauStatut === 'APPROUVEE') {
+        document.getElementById('mv-titre').textContent = '✓ Approuver le crédit';
+        document.getElementById('mv-champ-montant').style.display = 'block';
+        document.getElementById('mv-btn-confirmer').className = 'btn btn-success';
+        document.getElementById('mv-btn-confirmer').textContent = '✓ Confirmer l\'approbation';
+      } else {
+        document.getElementById('mv-titre').textContent = '✗ Rejeter le crédit';
+        document.getElementById('mv-champ-montant').style.display = 'none';
+        document.getElementById('mv-btn-confirmer').className = 'btn btn-danger';
+        document.getElementById('mv-btn-confirmer').textContent = '✗ Confirmer le rejet';
+      }
+
+      modal.classList.add('open');
+    }
+
+    async function confirmerValidation() {
+      const modal = document.getElementById('modal-validation-credit');
+      const creditId = modal.dataset.creditId;
+      const nouveauStatut = modal.dataset.nouveauStatut;
+      const commentaire = document.getElementById('mv-commentaire').value.trim();
+      const montantEl = document.getElementById('mv-montant');
+
+      const payload = { statut: nouveauStatut, commentaire_agent: commentaire };
+
+      if (nouveauStatut === 'APPROUVEE') {
+        if (!montantEl.value) {
+          toast('Veuillez saisir le montant approuvé.', 'error'); return;
+        }
+        payload.montant_approuve = montantEl.value;
+      }
+
+      const btn = document.getElementById('mv-btn-confirmer');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Traitement…';
+
+      try {
+        const r = await API(`/credits/demandes/${creditId}/statut/`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.statut || JSON.stringify(d));
+
+        toast(
+          nouveauStatut === 'APPROUVEE'
+            ? '✓ Crédit approuvé avec succès !'
+            : '✗ Crédit rejeté.',
+          nouveauStatut === 'APPROUVEE' ? 'success' : 'error'
+        );
+        modal.classList.remove('open');
+        await chargerTousLesCredits();
+
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirmer';
+      }
+    }
+
+    async function changerStatutCredit(creditId, statut, commentaire) {
+      try {
+        const r = await API(`/credits/demandes/${creditId}/statut/`, {
+          method: 'PATCH',
+          body: JSON.stringify({ statut, commentaire_agent: commentaire }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.statut || JSON.stringify(d));
+
+        const messages = {
+          'EN_ANALYSE': 'Dossier pris en charge.',
+          'DECAISSEE': '💰 Fonds décaissés avec succès !',
+        };
+        toast(messages[statut] || 'Statut mis à jour.', 'success');
+        await chargerTousLesCredits();
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
     // ═══════════════════════════════════════════════════════════
     // PAGE : CRÉDITS CLIENT
     // ═══════════════════════════════════════════════════════════
@@ -1105,12 +1324,7 @@
     <div id="detail-credit-zone"></div>
     
   `;
-      // Dans pageCredits(), après le tableau des crédits, ajouter
-      `<div style="margin-top:12px">
-      <button class="btn btn-outline btn-sm" onclick="afficherPage('assurance')">
-        🛡️ Voir mes polices d'assurance
-      </button>
-    </div>`
+
       try {
         const r = await API('/credits/demandes/');
         const d = await r.json();
@@ -1138,11 +1352,16 @@
               <td>${badgeStatut(cr.statut)}</td>
               <td>${cr.score_eligibilite != null ? `<strong>${cr.score_eligibilite}/100</strong>` : '—'}</td>
               <td>${formatDate(cr.date_soumission)}</td>
-              <td><button class="btn btn-outline btn-sm" onclick="voirDetailCredit(${cr.id})">Détails</button></td>
+              <td><button class="btn btn-outline btn-sm" onclick="voirDetailCredit(${cr.id})">Détails</button>              </td>
             </tr>`).join('')}
         </tbody>
-      </table></div>`;
-      } catch (e) { console.error(e); }
+      </table></div>
+      <div style="margin-top:12px; padding: 16px; border-top: 1px solid #EEF1F3;">
+        <button class="btn btn-outline btn-sm" onclick="afficherPage('assurance')">
+          🛡️ Voir mes polices d'assurance
+        </button>
+      </div>`;
+      } catch (e) { toast(e.message, 'error'); }
     }
 
     async function voirDetailCredit(id) {
@@ -1276,7 +1495,8 @@
         toast('Document uploadé !', 'success');
         // Rafraîchir la liste
         const rp = await API(`/credits/demandes/${demandeId}/pieces/`);
-        const pcs = (await rp.json()).results || await rp.json();
+        const pcsData = await rp.json();
+        const pcs = pcsData.results || pcsData;
         document.getElementById(`pieces-list-${demandeId}`).innerHTML =
           pcs.map(p => `
         <div class="upload-item">
@@ -1293,6 +1513,13 @@
       card.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       e.target.classList.add('active');
       card.querySelector('#' + targetId).classList.add('active');
+    }
+
+    function switchTabGlobal(e, targetId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(targetId).classList.add('active');
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -1588,6 +1815,7 @@
     <div style="padding:12px 16px;border-top:1px solid #EEF1F3;display:flex;gap:8px">
       <input id="msg-input" type="text" placeholder="Écrivez votre message…"
              style="flex:1;border:1.5px solid #D5D8DC;border-radius:24px;padding:10px 16px;font-size:13px;outline:none"
+             oninput="sendFrappe()"
              onkeypress="if(event.key==='Enter')envoyerMsg()" />
       <button onclick="envoyerMsg()" style="background:var(--bleu);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:16px">➤</button>
     </div>
@@ -1648,6 +1876,16 @@
       if (!msg || !chatSocket || chatSocket.readyState !== 1) return;
       chatSocket.send(JSON.stringify({ type: 'message', contenu: msg }));
       input.value = '';
+    }
+
+    let _frappeSent = false;
+    function sendFrappe() {
+        if (!chatSocket || chatSocket.readyState !== 1) return;
+        if (!_frappeSent) {
+            chatSocket.send(JSON.stringify({ type: 'frappe' }));
+            _frappeSent = true;
+            setTimeout(() => { _frappeSent = false; }, 2000);
+        }
     }
 
     async function nouvelleConversation() {
@@ -1753,7 +1991,7 @@
                 <td>${cv.client_region || '—'}</td>
                 <td>${cv.sujet}</td>
                 <td style="color:${cv.attente_minutes > 60 ? 'var(--rouge)' : 'var(--vert)'}"><strong>${cv.attente_minutes} min</strong></td>
-                <td><button class="btn btn-primary btn-sm" onclick="pageChat()">Ouvrir</button></td>
+                <td><button class="btn btn-primary btn-sm" onclick="afficherPage('chat'); setTimeout(() => ouvrirConversation(${cv.id}, '${cv.sujet.replace(/'/g, "\\'")}'), 300)">Ouvrir</button></td>
               </tr>`).join('')}
           </tbody>
         </table></div>`;

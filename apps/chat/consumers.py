@@ -21,14 +21,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"type": "connexion", "message": "Connecté"}))
  
     async def disconnect(self, close_code):
-        async def disconnect(self, close_code):
-            await self.channel_layer.group_discard(
-            self.room_group_name, self.channel_name)
-            # Mettre l'agent hors ligne à la déconnexion WebSocket
-            if self.scope["user"].role in ["AGENT", "ADMIN"]:
-                await self.mettre_hors_ligne(self.scope["user"])
-
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        # Mettre l'agent hors ligne à la déconnexion WebSocket
+        if self.scope["user"].role in ["AGENT", "ADMIN"]:
+            await self.mettre_hors_ligne(self.scope["user"])
  
     async def receive(self, text_data):
         data         = json.loads(text_data)
@@ -63,7 +59,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_frappe(self, event):
         if event["auteur_id"] != self.scope["user"].id:
             await self.send(text_data=json.dumps({
-                "type": "frappe", "auteur_nom": event["auteur_nom"]}))
+                "type": "frappe", 
+                "auteur_nom": event["auteur_nom"],
+                "auteur_id": event["auteur_id"]
+            }))
  
     @database_sync_to_async
     def get_conversation(self, conv_id):

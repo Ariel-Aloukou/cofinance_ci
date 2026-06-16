@@ -8,10 +8,11 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from .models import FormulaAssurance, Souscription
-from .serializers import FormulaAssuranceSerializer, SouscriptionSerializer
+from .serializers import FormulaAssuranceCreateSerializer, SouscriptionSerializer, FormulaAssuranceSerializer
 from .services import verifier_expirations
 from apps.authentication.permissions import EstClient, EstAdmin
 from apps.notifications.models import Notification
+
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -162,5 +163,5 @@ class VerifierExpirationsView(APIView):
         
 @extend_schema(tags=["Assurance"], summary="Créer une formule (Admin)")
 class FormulaCreateView(generics.CreateAPIView):
-    serializer_class   = FormulaAssuranceSerializer
+    serializer_class   = FormulaAssuranceCreateSerializer
     permission_classes = [EstAdmin]        

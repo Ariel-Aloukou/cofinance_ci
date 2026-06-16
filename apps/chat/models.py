@@ -9,7 +9,11 @@ class Conversation(models.Model):
     client     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="conversations_client")
     agent      = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="conversations_agent")
     sujet      = models.CharField(max_length=200, default="Support client")
-    statut     = models.CharField(max_length=10, choices=STATUT_CHOICES)
+    statut = models.CharField(
+        max_length=15,
+        choices=STATUT_CHOICES,
+        default="OUVERTE"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
  
@@ -19,7 +23,14 @@ class Message(models.Model):
     contenu      = models.TextField()
     est_lu       = models.BooleanField(default=False)
     created_at   = models.DateTimeField(auto_now_add=True)
-    ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.auteur.username} ({self.created_at})"
+
+    class Meta:
+        verbose_name = "Message"
+        verbose_name_plural = "Messages"
+        ordering = ["created_at"]
 
 class EvaluationConversation(models.Model):
     """

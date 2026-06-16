@@ -109,8 +109,6 @@ def changer_statut_avec_historique(demande, nouveau_statut, agent, commentaire="
         demande.date_approbation  = timezone.now()
     if nouveau_statut == "DECAISSEE":
         demande.date_decaissement = timezone.now()
-    if commentaire:
-        demande.commentaire_agent = commentaire
     demande.save()
  
     # 4. Notification automatique au client

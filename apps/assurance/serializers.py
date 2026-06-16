@@ -43,3 +43,14 @@ class SouscriptionSerializer(serializers.ModelSerializer):
         from datetime import date
         delta = obj.date_expiration - date.today()
         return delta.days
+
+
+class FormulaAssuranceCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = FormulaAssurance
+        fields = [
+            'nom', 'categorie', 'description',
+            'prime_mensuelle', 'capital_garanti',
+            'duree_mois', 'est_active',
+        ]
+        # Pas de read_only_fields ici — tout est modifiable        

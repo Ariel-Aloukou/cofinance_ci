@@ -10,7 +10,6 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from drf_spectacular.utils import extend_schema
 
 # Modèles
-from apps.authentication.management.commands.seed_db import User
 from apps.credits.models import (
     DemandeCredit,
     HistoriqueStatutCredit,
